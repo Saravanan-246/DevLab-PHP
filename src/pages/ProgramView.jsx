@@ -1,7 +1,43 @@
-import React from "react";
+import React, { useMemo } from "react";
 import CodeBlock from "../components/CodeBlock";
 import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
+
+// Helper function to split multi-file code strings into separate code blocks
+function parseCodeBlocks(rawCode, defaultLang, defaultFile) {
+  if (!rawCode) return [];
+
+  const fileHeaderRegex = /(?:^\s*(?:\/\/|<!--)\s*([\w\.-]+\.(?:java|xml|sql|php|html))\s*(?:-->)?)/gm;
+  const matches = [...rawCode.matchAll(fileHeaderRegex)];
+
+  if (matches.length <= 1) {
+    return [{ filename: defaultFile, language: defaultLang, code: rawCode.trim() }];
+  }
+
+  const blocks = [];
+  for (let i = 0; i < matches.length; i++) {
+    const filename = matches[i][1];
+    const startIndex = matches[i].index + matches[i][0].length;
+    const endIndex = i + 1 < matches.length ? matches[i + 1].index : rawCode.length;
+
+    let blockCode = rawCode.slice(startIndex, endIndex).trim();
+
+    const ext = filename.split(".").pop().toLowerCase();
+    let language = defaultLang;
+    if (ext === "xml") language = "xml";
+    if (ext === "java") language = "java";
+    if (ext === "sql") language = "sql";
+    if (ext === "php") language = "php";
+
+    blocks.push({
+      filename,
+      language,
+      code: blockCode,
+    });
+  }
+
+  return blocks;
+}
 
 function ProgramView({
   programs = [],
@@ -14,16 +50,31 @@ function ProgramView({
 }) {
   const currentProgram = selectedProgram || programs[0];
 
-  const currentIndex = programs.findIndex(
+  const categoryUpper = String(currentProgram?.category || "").toUpperCase();
+  const isAndroid = categoryUpper === "ANDROID";
+  const isMySQL = categoryUpper === "MYSQL";
+
+  // Filter practicals so Android view ONLY shows Android practicals
+  const activeCategoryPrograms = useMemo(() => {
+    if (isAndroid) {
+      return programs.filter((p) => String(p.category).toUpperCase() === "ANDROID");
+    }
+    return programs.filter((p) => {
+      const cat = String(p.category).toUpperCase();
+      return cat === "PHP" || cat === "MYSQL";
+    });
+  }, [programs, isAndroid]);
+
+  const currentIndex = activeCategoryPrograms.findIndex(
     (program) => String(program?.id) === String(currentProgram?.id)
   );
 
   const previousProgram =
-    currentIndex > 0 ? programs[currentIndex - 1] : null;
+    currentIndex > 0 ? activeCategoryPrograms[currentIndex - 1] : null;
 
   const nextProgram =
-    currentIndex >= 0 && currentIndex < programs.length - 1
-      ? programs[currentIndex + 1]
+    currentIndex >= 0 && currentIndex < activeCategoryPrograms.length - 1
+      ? activeCategoryPrograms[currentIndex + 1]
       : null;
 
   const handleSelectProgram = (programId) => {
@@ -47,7 +98,7 @@ function ProgramView({
     return (
       <main className="program-view-empty">
         <div className="program-view-empty__box">
-          <span>PHP & MySQL Lab</span>
+          <span>Practical Workspace</span>
           <h1>Practical not found</h1>
           <p>The selected practical is unavailable.</p>
           <button type="button" onClick={onClose}>
@@ -61,15 +112,15 @@ function ProgramView({
             display: grid;
             place-items: center;
             padding: 24px;
-            background: var(--bg, #0d0f12);
+            background: var(--bg, #090b0e);
             color: var(--text, #f0f4f8);
           }
 
           .program-view-empty__box {
             width: min(400px, 100%);
             padding: 28px;
-            border: 1px solid var(--border, #1e2631);
-            border-radius: 12px;
+            border: 1px solid var(--border, #1a202c);
+            border-radius: 2px;
             background: var(--surface, #11151c);
             text-align: center;
           }
@@ -78,16 +129,18 @@ function ProgramView({
             color: var(--accent, #3b82f6);
             font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
             font-size: 11px;
+            text-transform: uppercase;
           }
 
           .program-view-empty h1 {
             margin-top: 10px;
             font-size: 22px;
+            font-weight: 700;
           }
 
           .program-view-empty p {
             margin-top: 8px;
-            color: var(--muted, #94a3b8);
+            color: var(--muted, #8a96a8);
             font-size: 13px;
           }
 
@@ -95,11 +148,12 @@ function ProgramView({
             margin-top: 20px;
             height: 38px;
             padding: 0 16px;
-            border: 1px solid var(--border, #2a3441);
-            border-radius: 6px;
-            background: var(--surface-soft, #161b24);
+            border: 1px solid var(--border-strong, #2d3748);
+            border-radius: 2px;
+            background: var(--surface-soft, #171d26);
             color: var(--text, #f0f4f8);
             cursor: pointer;
+            font-weight: 600;
           }
 
           .program-view-empty button:hover {
@@ -123,20 +177,31 @@ function ProgramView({
     examTips = [],
   } = currentProgram;
 
+  const defaultLanguage = isAndroid ? "java" : isMySQL ? "sql" : "php";
+  const defaultFilename = isAndroid
+    ? "MainActivity.java"
+    : isMySQL
+    ? "query.sql"
+    : "index.php";
+
+  const parsedBlocks = parseCodeBlocks(code, defaultLanguage, defaultFilename);
+
   return (
-    <main className={`program-view ${className}`}>
+    <main className={`program-view ${isAndroid ? "program-view--android" : ""} ${className}`}>
       {/* Header Bar */}
       <header className="program-view__topbar">
         <div className="program-view__topbar-inner">
           <div className="program-view__brand">
             <Logo compact />
             <span className="program-view__brand-divider" />
-            <span className="program-view__brand-context">Practical Lab</span>
+            <span className="program-view__brand-context">
+              {isAndroid ? "Android Lab" : "PHP & MySQL Lab"}
+            </span>
           </div>
 
           <div className="program-view__actions">
             <span className="program-view__counter">
-              {number} / {String(programs.length).padStart(2, "0")}
+              {number} / {String(activeCategoryPrograms.length).padStart(2, "0")}
             </span>
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
             <button
@@ -152,11 +217,13 @@ function ProgramView({
       </header>
 
       <div className="program-view__layout">
-        {/* Desktop Sidebar */}
+        {/* Sidebar - Strictly filtered to current category */}
         <aside className="program-view__sidebar">
-          <span className="program-view__sidebar-label">Practicals</span>
+          <span className="program-view__sidebar-label">
+            {isAndroid ? "Android Practicals" : "PHP & MySQL Practicals"}
+          </span>
           <div className="program-view__program-list">
-            {programs.map((program) => {
+            {activeCategoryPrograms.map((program) => {
               const isActive = String(program.id) === String(currentProgram.id);
               return (
                 <button
@@ -182,11 +249,11 @@ function ProgramView({
 
         {/* Main Content Viewport */}
         <article className="program-view__content">
-          {/* Mobile Selector */}
+          {/* Mobile Horizontal Selector */}
           <div className="program-view__mobile-programs">
-            <span className="program-view__mobile-label">Practicals</span>
+            <span className="program-view__mobile-label">Select Practical</span>
             <div className="program-view__mobile-list">
-              {programs.map((program) => {
+              {activeCategoryPrograms.map((program) => {
                 const isActive = String(program.id) === String(currentProgram.id);
                 return (
                   <button
@@ -210,7 +277,9 @@ function ProgramView({
             <div className="program-view__eyebrow">
               <span>Practical {number}</span>
               <span className="program-view__divider" />
-              <span>{category}</span>
+              <span className="program-view__category-tag">
+                {isAndroid ? "Android" : isMySQL ? "MySQL" : "PHP"}
+              </span>
             </div>
 
             <h1 className="program-view__title">{title}</h1>
@@ -246,13 +315,15 @@ function ProgramView({
               >
                 Output
               </button>
-              <button
-                type="button"
-                className="program-view__quick-button"
-                onClick={() => scrollToSection("exam")}
-              >
-                Exam tips
-              </button>
+              {examTips.length > 0 && (
+                <button
+                  type="button"
+                  className="program-view__quick-button"
+                  onClick={() => scrollToSection("exam")}
+                >
+                  Exam tips
+                </button>
+              )}
             </div>
           </header>
 
@@ -277,14 +348,20 @@ function ProgramView({
             </div>
           </section>
 
-          {/* Code Section */}
+          {/* Source Code Section */}
           <section id="code" className="program-view__section">
             <span className="program-view__label">Source Code</span>
-            <CodeBlock
-              code={code}
-              language={category === "MYSQL" ? "SQL" : "PHP"}
-              filename={category === "MYSQL" ? "query.sql" : "index.php"}
-            />
+            <div className="program-view__code-container">
+              {parsedBlocks.map((block, index) => (
+                <div key={index} className="program-view__code-block-wrapper">
+                  <CodeBlock
+                    code={block.code}
+                    language={block.language}
+                    filename={block.filename}
+                  />
+                </div>
+              ))}
+            </div>
           </section>
 
           {/* Output Section */}
@@ -293,7 +370,7 @@ function ProgramView({
             <div className="program-view__output">
               <div className="program-view__output-header">
                 <span className="program-view__output-title">
-                  Console output
+                  {isAndroid ? "Device Screen / Logcat" : "Console / Browser output"}
                 </span>
               </div>
               <pre>
@@ -380,8 +457,15 @@ function ProgramView({
           min-height: 100vh;
           width: 100%;
           overflow-x: hidden;
-          background: var(--bg, #0d0f12);
+          background: var(--bg, #090b0e);
           color: var(--text, #f0f4f8);
+          font-family: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+
+          --theme-accent: #3b82f6;
+        }
+
+        .program-view--android {
+          --theme-accent: #10b981;
         }
 
         .program-view__topbar {
@@ -389,13 +473,13 @@ function ProgramView({
           top: 0;
           z-index: 50;
           width: 100%;
-          border-bottom: 1px solid var(--border, #1e2631);
-          background: var(--bg, #0d0f12);
+          border-bottom: 1px solid var(--border, #1a202c);
+          background: var(--bg, #090b0e);
         }
 
         .program-view__topbar-inner {
-          width: min(1160px, calc(100% - 32px));
-          height: 64px;
+          width: min(1180px, calc(100% - 32px));
+          height: 60px;
           margin: 0 auto;
           display: flex;
           align-items: center;
@@ -412,14 +496,15 @@ function ProgramView({
         .program-view__brand-divider {
           width: 1px;
           height: 16px;
-          background: var(--border, #1e2631);
+          background: var(--border, #1a202c);
         }
 
         .program-view__brand-context {
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 11px;
-          color: var(--muted, #94a3b8);
+          color: var(--muted, #8a96a8);
           white-space: nowrap;
+          text-transform: uppercase;
         }
 
         .program-view__actions {
@@ -432,34 +517,34 @@ function ProgramView({
         .program-view__counter {
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 11px;
-          color: var(--muted, #94a3b8);
+          color: var(--muted, #8a96a8);
         }
 
         .program-view__close {
           height: 34px;
           padding: 0 14px;
-          border: 1px solid var(--border, #2a3441);
-          border-radius: 6px;
+          border: 1px solid var(--border-strong, #2d3748);
+          border-radius: 2px;
           background: var(--surface, #11151c);
           color: var(--text, #f0f4f8);
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.18s ease;
+          transition: all 0.15s ease;
         }
 
         .program-view__close:hover {
-          border-color: var(--accent, #3b82f6);
-          background: var(--surface-soft, #161b24);
+          border-color: var(--theme-accent);
+          background: var(--surface-soft, #171d26);
         }
 
         .program-view__layout {
-          width: min(1160px, calc(100% - 32px));
+          width: min(1180px, calc(100% - 32px));
           margin: 0 auto;
           display: grid;
-          grid-template-columns: 220px minmax(0, 1fr);
-          gap: 40px;
-          padding: 40px 0 80px;
+          grid-template-columns: 240px minmax(0, 1fr);
+          gap: 36px;
+          padding: 36px 0 80px;
         }
 
         .program-view__content {
@@ -469,7 +554,7 @@ function ProgramView({
 
         .program-view__sidebar {
           position: sticky;
-          top: 84px;
+          top: 80px;
           align-self: start;
         }
 
@@ -478,14 +563,16 @@ function ProgramView({
           margin-bottom: 10px;
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 10px;
-          color: var(--muted, #94a3b8);
+          color: var(--muted, #8a96a8);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
         }
 
         .program-view__program-list {
           display: flex;
           flex-direction: column;
-          border: 1px solid var(--border, #1e2631);
-          border-radius: 10px;
+          border: 1px solid var(--border-strong, #2d3748);
+          border-radius: 2px;
           background: var(--surface, #11151c);
           max-height: calc(100vh - 120px);
           overflow-y: auto;
@@ -496,11 +583,11 @@ function ProgramView({
           display: flex;
           align-items: center;
           gap: 10px;
-          padding: 12px 14px;
+          padding: 11px 14px;
           border: 0;
-          border-bottom: 1px solid var(--border, #1e2631);
+          border-bottom: 1px solid var(--border, #1a202c);
           background: transparent;
-          color: var(--muted, #94a3b8);
+          color: var(--muted, #8a96a8);
           font-size: 12px;
           font-weight: 500;
           text-align: left;
@@ -513,12 +600,12 @@ function ProgramView({
         }
 
         .program-view__program:hover {
-          background: var(--surface-soft, #161b24);
+          background: var(--surface-soft, #171d26);
           color: var(--text, #f0f4f8);
         }
 
         .program-view__program--active {
-          background: var(--surface-soft, #161b24) !important;
+          background: var(--surface-soft, #171d26) !important;
           color: #ffffff !important;
           font-weight: 600;
         }
@@ -527,17 +614,16 @@ function ProgramView({
           content: "";
           position: absolute;
           left: 0;
-          top: 8px;
-          bottom: 8px;
+          top: 6px;
+          bottom: 6px;
           width: 3px;
-          border-radius: 0 2px 2px 0;
-          background: var(--accent, #3b82f6);
+          background: var(--theme-accent);
         }
 
         .program-view__program-number {
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 11px;
-          color: var(--accent, #3b82f6);
+          color: var(--theme-accent);
         }
 
         .program-view__program-name {
@@ -556,37 +642,41 @@ function ProgramView({
           gap: 8px;
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 11px;
-          color: var(--accent, #3b82f6);
+          color: var(--theme-accent);
+        }
+
+        .program-view__category-tag {
+          font-weight: 600;
         }
 
         .program-view__divider {
-          width: 16px;
+          width: 12px;
           height: 1px;
-          background: var(--border, #1e2631);
+          background: var(--border-strong, #2d3748);
         }
 
         .program-view__title {
-          margin: 12px 0 0 0;
-          font-size: clamp(24px, 5vw, 44px);
+          margin: 10px 0 0 0;
+          font-size: clamp(22px, 4vw, 38px);
           font-weight: 800;
-          line-height: 1.2;
+          line-height: 1.25;
           letter-spacing: -0.02em;
           overflow-wrap: break-word;
           word-break: break-word;
         }
 
         .program-view__description {
-          margin: 12px 0 0 0;
+          margin: 10px 0 0 0;
           font-size: 14px;
           line-height: 1.6;
-          color: var(--muted, #94a3b8);
+          color: var(--muted, #8a96a8);
           overflow-wrap: break-word;
         }
 
         .program-view__quick-nav {
           display: flex;
           gap: 8px;
-          margin-top: 24px;
+          margin-top: 20px;
           overflow-x: auto;
           padding-bottom: 4px;
           scrollbar-width: none;
@@ -598,12 +688,12 @@ function ProgramView({
 
         .program-view__quick-button {
           padding: 6px 12px;
-          border: 1px solid var(--border, #2a3441);
-          border-radius: 6px;
+          border: 1px solid var(--border-strong, #2d3748);
+          border-radius: 2px;
           background: var(--surface, #11151c);
-          color: var(--muted, #94a3b8);
+          color: var(--muted, #8a96a8);
           font-size: 11px;
-          font-weight: 500;
+          font-weight: 600;
           cursor: pointer;
           transition: all 0.15s ease;
           white-space: nowrap;
@@ -611,22 +701,29 @@ function ProgramView({
         }
 
         .program-view__quick-button:hover {
-          border-color: var(--accent, #3b82f6);
+          border-color: var(--theme-accent);
           color: var(--text, #f0f4f8);
         }
 
         .program-view__section {
-          padding-top: 36px;
-          scroll-margin-top: 80px;
+          padding-top: 32px;
+          scroll-margin-top: 70px;
         }
 
         .program-view__label {
           display: block;
-          margin-bottom: 12px;
+          margin-bottom: 10px;
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 11px;
           font-weight: 600;
-          color: var(--accent, #3b82f6);
+          color: var(--theme-accent);
+          text-transform: uppercase;
+        }
+
+        .program-view__code-container {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
         }
 
         .program-view__aim {
@@ -638,7 +735,7 @@ function ProgramView({
         }
 
         .program-view__algorithm {
-          border-top: 1px solid var(--border, #1e2631);
+          border-top: 1px solid var(--border, #1a202c);
         }
 
         .program-view__algorithm-row,
@@ -646,14 +743,14 @@ function ProgramView({
           display: grid;
           grid-template-columns: 28px minmax(0, 1fr);
           gap: 12px;
-          padding: 12px 0;
-          border-bottom: 1px solid var(--border, #1e2631);
+          padding: 10px 0;
+          border-bottom: 1px solid var(--border, #1a202c);
         }
 
         .program-view__step-number {
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 11px;
-          color: var(--muted, #94a3b8);
+          color: var(--muted, #8a96a8);
         }
 
         .program-view__step-text {
@@ -664,27 +761,27 @@ function ProgramView({
         }
 
         .program-view__output {
-          border: 1px solid var(--border, #1e2631);
-          border-radius: 10px;
+          border: 1px solid var(--border-strong, #2d3748);
+          border-radius: 2px;
           background: var(--surface, #11151c);
           overflow: hidden;
         }
 
         .program-view__output-header {
-          padding: 10px 16px;
-          border-bottom: 1px solid var(--border, #1e2631);
-          background: var(--surface-soft, #161b24);
+          padding: 10px 14px;
+          border-bottom: 1px solid var(--border, #1a202c);
+          background: var(--surface-soft, #171d26);
         }
 
         .program-view__output-title {
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 11px;
-          color: var(--muted, #94a3b8);
+          color: var(--muted, #8a96a8);
         }
 
         .program-view__output pre {
           margin: 0;
-          padding: 16px;
+          padding: 14px;
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 12px;
           line-height: 1.7;
@@ -695,10 +792,10 @@ function ProgramView({
         }
 
         .program-view__exam {
-          margin-top: 40px;
-          padding: 20px;
-          border: 1px solid var(--border, #1e2631);
-          border-radius: 10px;
+          margin-top: 36px;
+          padding: 18px;
+          border: 1px solid var(--border-strong, #2d3748);
+          border-radius: 2px;
           background: var(--surface, #11151c);
         }
 
@@ -706,7 +803,7 @@ function ProgramView({
           display: flex;
           gap: 10px;
           padding: 8px 0;
-          border-bottom: 1px solid var(--border, #1e2631);
+          border-bottom: 1px solid var(--border, #1a202c);
         }
 
         .program-view__exam-row:last-child {
@@ -714,8 +811,9 @@ function ProgramView({
         }
 
         .program-view__exam-mark {
-          color: var(--accent, #3b82f6);
+          color: var(--theme-accent);
           font-size: 12px;
+          font-weight: 700;
         }
 
         .program-view__exam-text {
@@ -728,29 +826,29 @@ function ProgramView({
         .program-view__navigation {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 16px;
-          margin-top: 48px;
-          padding-top: 24px;
-          border-top: 1px solid var(--border, #1e2631);
+          gap: 14px;
+          margin-top: 40px;
+          padding-top: 20px;
+          border-top: 1px solid var(--border, #1a202c);
         }
 
         .program-view__navigation-button {
           display: flex;
           flex-direction: column;
-          padding: 14px;
-          border: 1px solid var(--border, #2a3441);
-          border-radius: 8px;
+          padding: 12px 14px;
+          border: 1px solid var(--border-strong, #2d3748);
+          border-radius: 2px;
           background: var(--surface, #11151c);
           color: var(--text, #f0f4f8);
           text-align: left;
           cursor: pointer;
-          transition: all 0.18s ease;
+          transition: all 0.15s ease;
           min-width: 0;
         }
 
         .program-view__navigation-button:hover:not(:disabled) {
-          border-color: var(--accent, #3b82f6);
-          background: var(--surface-soft, #161b24);
+          border-color: var(--theme-accent);
+          background: var(--surface-soft, #171d26);
         }
 
         .program-view__navigation-button--next {
@@ -760,7 +858,7 @@ function ProgramView({
         .program-view__navigation-label {
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 10px;
-          color: var(--muted, #94a3b8);
+          color: var(--muted, #8a96a8);
         }
 
         .program-view__navigation-title {
@@ -777,16 +875,13 @@ function ProgramView({
           cursor: not-allowed;
         }
 
-        /* Mobile Layout Optimizations */
         @media (max-width: 850px) {
           .program-view__topbar-inner {
             width: calc(100% - 24px);
+            height: 54px;
           }
 
-          .program-view__brand-context {
-            display: none;
-          }
-
+          .program-view__brand-context,
           .program-view__brand-divider {
             display: none;
           }
@@ -794,7 +889,7 @@ function ProgramView({
           .program-view__layout {
             grid-template-columns: 1fr;
             width: calc(100% - 24px);
-            padding: 24px 0 60px;
+            padding: 20px 0 60px;
           }
 
           .program-view__sidebar {
@@ -811,7 +906,8 @@ function ProgramView({
             margin-bottom: 8px;
             font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
             font-size: 10px;
-            color: var(--muted, #94a3b8);
+            color: var(--muted, #8a96a8);
+            text-transform: uppercase;
           }
 
           .program-view__mobile-list {
@@ -824,20 +920,20 @@ function ProgramView({
 
           .program-view__mobile-button {
             padding: 6px 12px;
-            border: 1px solid var(--border, #1e2631);
-            border-radius: 6px;
+            border: 1px solid var(--border-strong, #2d3748);
+            border-radius: 2px;
             background: var(--surface, #11151c);
-            color: var(--muted, #94a3b8);
+            color: var(--muted, #8a96a8);
             font-size: 11px;
+            font-weight: 600;
             cursor: pointer;
             flex-shrink: 0;
           }
 
           .program-view__mobile-button--active {
-            border-color: var(--accent, #3b82f6);
-            background: var(--surface-soft, #161b24);
-            color: var(--text, #ffffff);
-            font-weight: 600;
+            border-color: var(--theme-accent);
+            background: var(--surface-soft, #171d26);
+            color: #ffffff;
           }
         }
 

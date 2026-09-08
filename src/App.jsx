@@ -4,34 +4,39 @@ import Landing from "./pages/Landing";
 import Programs from "./pages/Programs";
 import ProgramView from "./pages/ProgramView";
 
-import programs from "./data/programs";
+import phpPrograms from "./data/programs";
+import androidPrograms from "./data/androidPrograms";
+
+const allPrograms = [...phpPrograms, ...androidPrograms];
 
 function App() {
   const [page, setPage] = useState("landing");
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [activeCategory, setActiveCategory] = useState("ALL");
 
   const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem("php-lab-theme");
+    const savedTheme = localStorage.getItem("devlab-theme");
     return savedTheme === "light" ? "light" : "dark";
   });
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("php-lab-theme", theme);
+    localStorage.setItem("devlab-theme", theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
-  const openPrograms = () => {
+  const openPrograms = (category = "ALL") => {
+    setActiveCategory(category);
     setSelectedProgram(null);
     setPage("programs");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const openProgram = (programId) => {
-    const program = programs.find(
+    const program = allPrograms.find(
       (item) =>
         String(item.id) === String(programId) ||
         String(item.number) === String(programId)
@@ -68,7 +73,8 @@ function App() {
 
       {page === "programs" && (
         <Programs
-          programs={programs}
+          programs={allPrograms}
+          initialCategory={activeCategory}
           theme={theme}
           onToggleTheme={toggleTheme}
           onOpenProgram={openProgram}
@@ -78,7 +84,7 @@ function App() {
 
       {page === "program" && (
         <ProgramView
-          programs={programs}
+          programs={allPrograms}
           selectedProgram={selectedProgram}
           theme={theme}
           onToggleTheme={toggleTheme}
