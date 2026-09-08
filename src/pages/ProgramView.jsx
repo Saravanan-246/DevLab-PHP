@@ -378,6 +378,8 @@ function ProgramView({
       <style>{`
         .program-view {
           min-height: 100vh;
+          width: 100%;
+          overflow-x: hidden;
           background: var(--bg, #0d0f12);
           color: var(--text, #f0f4f8);
         }
@@ -404,6 +406,7 @@ function ProgramView({
           display: flex;
           align-items: center;
           gap: 12px;
+          min-width: 0;
         }
 
         .program-view__brand-divider {
@@ -416,12 +419,14 @@ function ProgramView({
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 11px;
           color: var(--muted, #94a3b8);
+          white-space: nowrap;
         }
 
         .program-view__actions {
           display: flex;
           align-items: center;
           gap: 12px;
+          flex-shrink: 0;
         }
 
         .program-view__counter {
@@ -452,9 +457,14 @@ function ProgramView({
           width: min(1160px, calc(100% - 32px));
           margin: 0 auto;
           display: grid;
-          grid-template-columns: 220px 1fr;
+          grid-template-columns: 220px minmax(0, 1fr);
           gap: 40px;
           padding: 40px 0 80px;
+        }
+
+        .program-view__content {
+          min-width: 0;
+          width: 100%;
         }
 
         .program-view__sidebar {
@@ -549,19 +559,28 @@ function ProgramView({
           color: var(--accent, #3b82f6);
         }
 
+        .program-view__divider {
+          width: 16px;
+          height: 1px;
+          background: var(--border, #1e2631);
+        }
+
         .program-view__title {
           margin: 12px 0 0 0;
-          font-size: clamp(28px, 4.5vw, 44px);
+          font-size: clamp(24px, 5vw, 44px);
           font-weight: 800;
           line-height: 1.2;
           letter-spacing: -0.02em;
+          overflow-wrap: break-word;
+          word-break: break-word;
         }
 
         .program-view__description {
           margin: 12px 0 0 0;
-          font-size: 15px;
+          font-size: 14px;
           line-height: 1.6;
           color: var(--muted, #94a3b8);
+          overflow-wrap: break-word;
         }
 
         .program-view__quick-nav {
@@ -570,6 +589,11 @@ function ProgramView({
           margin-top: 24px;
           overflow-x: auto;
           padding-bottom: 4px;
+          scrollbar-width: none;
+        }
+
+        .program-view__quick-nav::-webkit-scrollbar {
+          display: none;
         }
 
         .program-view__quick-button {
@@ -583,6 +607,7 @@ function ProgramView({
           cursor: pointer;
           transition: all 0.15s ease;
           white-space: nowrap;
+          flex-shrink: 0;
         }
 
         .program-view__quick-button:hover {
@@ -591,7 +616,7 @@ function ProgramView({
         }
 
         .program-view__section {
-          padding-top: 40px;
+          padding-top: 36px;
           scroll-margin-top: 80px;
         }
 
@@ -609,6 +634,7 @@ function ProgramView({
           font-size: 14px;
           line-height: 1.7;
           color: var(--text, #f0f4f8);
+          overflow-wrap: break-word;
         }
 
         .program-view__algorithm {
@@ -618,7 +644,7 @@ function ProgramView({
         .program-view__algorithm-row,
         .program-view__list-row {
           display: grid;
-          grid-template-columns: 32px 1fr;
+          grid-template-columns: 28px minmax(0, 1fr);
           gap: 12px;
           padding: 12px 0;
           border-bottom: 1px solid var(--border, #1e2631);
@@ -634,6 +660,7 @@ function ProgramView({
           font-size: 13px;
           line-height: 1.6;
           color: var(--text, #f0f4f8);
+          overflow-wrap: break-word;
         }
 
         .program-view__output {
@@ -657,13 +684,14 @@ function ProgramView({
 
         .program-view__output pre {
           margin: 0;
-          padding: 18px;
+          padding: 16px;
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
           font-size: 12px;
           line-height: 1.7;
           color: var(--text, #f0f4f8);
           overflow-x: auto;
           white-space: pre-wrap;
+          word-break: break-all;
         }
 
         .program-view__exam {
@@ -694,6 +722,7 @@ function ProgramView({
           font-size: 13px;
           line-height: 1.6;
           color: var(--text, #f0f4f8);
+          overflow-wrap: break-word;
         }
 
         .program-view__navigation {
@@ -708,7 +737,7 @@ function ProgramView({
         .program-view__navigation-button {
           display: flex;
           flex-direction: column;
-          padding: 16px;
+          padding: 14px;
           border: 1px solid var(--border, #2a3441);
           border-radius: 8px;
           background: var(--surface, #11151c);
@@ -716,6 +745,7 @@ function ProgramView({
           text-align: left;
           cursor: pointer;
           transition: all 0.18s ease;
+          min-width: 0;
         }
 
         .program-view__navigation-button:hover:not(:disabled) {
@@ -735,7 +765,7 @@ function ProgramView({
 
         .program-view__navigation-title {
           margin-top: 4px;
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 600;
           overflow: hidden;
           white-space: nowrap;
@@ -747,9 +777,24 @@ function ProgramView({
           cursor: not-allowed;
         }
 
+        /* Mobile Layout Optimizations */
         @media (max-width: 850px) {
+          .program-view__topbar-inner {
+            width: calc(100% - 24px);
+          }
+
+          .program-view__brand-context {
+            display: none;
+          }
+
+          .program-view__brand-divider {
+            display: none;
+          }
+
           .program-view__layout {
             grid-template-columns: 1fr;
+            width: calc(100% - 24px);
+            padding: 24px 0 60px;
           }
 
           .program-view__sidebar {
@@ -758,7 +803,7 @@ function ProgramView({
 
           .program-view__mobile-programs {
             display: block;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
           }
 
           .program-view__mobile-label {
@@ -774,6 +819,7 @@ function ProgramView({
             gap: 6px;
             overflow-x: auto;
             padding-bottom: 4px;
+            scrollbar-width: thin;
           }
 
           .program-view__mobile-button {
@@ -784,6 +830,7 @@ function ProgramView({
             color: var(--muted, #94a3b8);
             font-size: 11px;
             cursor: pointer;
+            flex-shrink: 0;
           }
 
           .program-view__mobile-button--active {
@@ -795,6 +842,10 @@ function ProgramView({
         }
 
         @media (max-width: 600px) {
+          .program-view__counter {
+            display: none;
+          }
+
           .program-view__navigation {
             grid-template-columns: 1fr;
           }
