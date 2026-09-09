@@ -4,104 +4,137 @@ function Button({
   children,
   variant = "primary",
   size = "md",
-  icon: Icon,
-  iconPosition = "left",
-  fullWidth = false,
-  disabled = false,
-  className = "",
   onClick,
   type = "button",
+  disabled = false,
+  className = "",
   ...props
 }) {
-  const baseStyle = {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
-    borderRadius: "8px",
-    fontWeight: "500",
-    fontSize: size === "sm" ? "13px" : size === "lg" ? "15px" : "14px",
-    lineHeight: "1.4",
-    padding:
-      size === "sm"
-        ? "6px 12px"
-        : size === "lg"
-        ? "12px 22px"
-        : "9px 16px",
-    width: fullWidth ? "100%" : "auto",
-    cursor: disabled ? "not-allowed" : "pointer",
-    opacity: disabled ? 0.5 : 1,
-    transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
-    outline: "none",
-    border: "1px solid transparent",
-    userSelect: "none",
-    whiteSpace: "nowrap",
-  };
+  const baseClass = "btn";
+  const variantClass = `btn--${variant}`;
+  const sizeClass = `btn--${size}`;
+  const disabledClass = disabled ? "btn--disabled" : "";
 
-  const variants = {
-    primary: {
-      backgroundColor: "var(--accent, #3b82f6)",
-      color: "#ffffff",
-      borderColor: "transparent",
-    },
-    secondary: {
-      backgroundColor: "var(--surface-soft, #1e2631)",
-      color: "var(--text, #f0f4f8)",
-      borderColor: "var(--border, #2a3441)",
-    },
-    outline: {
-      backgroundColor: "transparent",
-      color: "var(--text, #f0f4f8)",
-      borderColor: "var(--border, #2a3441)",
-    },
-    ghost: {
-      backgroundColor: "transparent",
-      color: "var(--muted, #94a3b8)",
-      borderColor: "transparent",
-    },
-  };
-
-  const selectedVariant = variants[variant] || variants.primary;
+  const combinedClassName = `${baseClass} ${variantClass} ${sizeClass} ${disabledClass} ${className}`.trim();
 
   return (
     <>
       <button
         type={type}
-        disabled={disabled}
         onClick={onClick}
-        className={`btn btn--${variant} btn--${size} ${className}`}
-        style={{ ...baseStyle, ...selectedVariant }}
+        disabled={disabled}
+        className={combinedClassName}
         {...props}
       >
-        {Icon && iconPosition === "left" && (
-          <Icon size={size === "sm" ? 14 : size === "lg" ? 18 : 16} />
-        )}
-        <span>{children}</span>
-        {Icon && iconPosition === "right" && (
-          <Icon size={size === "sm" ? 14 : size === "lg" ? 18 : 16} />
-        )}
+        <span className="btn__content">{children}</span>
       </button>
 
+      {/* Global component styles rendered once per app scope */}
       <style>{`
-        .btn:hover:not(:disabled) {
-          filter: brightness(1.08);
-          transform: translateY(-1px);
+        /* Base Button Styles */
+        .btn {
+          --btn-accent: var(--accent, #0284c7);
+          --btn-accent-hover: var(--accent-hover, #0369a1);
+          --btn-text-on-accent: var(--accent-text, #ffffff);
+          --btn-surface: var(--surface-soft, rgba(255, 255, 255, 0.05));
+          --btn-surface-hover: var(--surface-strong, rgba(255, 255, 255, 0.1));
+          --btn-border: var(--border-strong, rgba(255, 255, 255, 0.15));
+          --btn-text: var(--text, #f3f4f6);
+
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          white-space: nowrap;
+          vertical-align: middle;
+          font-family: inherit;
+          font-weight: 600;
+          line-height: 1;
+          border-radius: var(--radius-md, 8px);
+          border: 1px solid transparent;
+          cursor: pointer;
+          user-select: none;
+          text-decoration: none;
+          transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+                      border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+                      color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+                      box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.05s ease;
+          outline: none;
+        }
+
+        .btn__content {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
         }
 
         .btn:active:not(:disabled) {
-          transform: translateY(0);
-          filter: brightness(0.96);
+          transform: scale(0.98);
         }
 
-        .btn--outline:hover:not(:disabled),
-        .btn--ghost:hover:not(:disabled) {
-          border-color: var(--accent, #3b82f6);
-          color: var(--text, #ffffff);
-          background-color: var(--surface-soft, #1e2631);
+        /* --- Sizes --- */
+        .btn--sm {
+          height: 32px;
+          padding: 0 12px;
+          font-size: 12px;
+          letter-spacing: 0.01em;
         }
 
+        .btn--md {
+          height: 40px;
+          padding: 0 16px;
+          font-size: 13.5px;
+          letter-spacing: -0.005em;
+        }
+
+        .btn--lg {
+          height: 48px;
+          padding: 0 24px;
+          font-size: 15px;
+          letter-spacing: -0.01em;
+        }
+
+        /* --- Variants --- */
+        /* Primary */
+        .btn--primary {
+          background-color: var(--btn-accent);
+          color: var(--btn-text-on-accent);
+          border-color: transparent;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn--primary:hover:not(:disabled) {
+          background-color: var(--btn-accent-hover);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Secondary */
+        .btn--secondary {
+          background-color: var(--btn-surface);
+          color: var(--btn-text);
+          border-color: var(--btn-border);
+          backdrop-filter: blur(8px);
+        }
+
+        .btn--secondary:hover:not(:disabled) {
+          background-color: var(--btn-surface-hover);
+          border-color: var(--btn-text);
+        }
+
+        /* Focus & Disabled States */
         .btn:focus-visible {
-          box-shadow: 0 0 0 2px var(--bg, #0d0f12), 0 0 0 4px var(--accent, #3b82f6);
+          outline: 2px solid var(--btn-accent);
+          outline-offset: 2px;
+        }
+
+        .btn--disabled,
+        .btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          pointer-events: none;
+          box-shadow: none;
         }
       `}</style>
     </>

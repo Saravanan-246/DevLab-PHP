@@ -4,15 +4,35 @@ function CodeBlock({
   code = "",
   language = "php",
   filename = "index.php",
+  theme = "dark",
   className = "",
 }) {
   const [copied, setCopied] = useState(false);
+  const isLight = theme === "light";
 
   const handleCopy = async () => {
     if (!code) return;
 
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        return;
+      } catch (err) {
+        console.warn("Clipboard API failed, falling back to execCommand: ", err);
+      }
+    }
+
     try {
-      await navigator.clipboard.writeText(code);
+      const textarea = document.createElement("textarea");
+      textarea.value = code;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -23,24 +43,28 @@ function CodeBlock({
   const normalizedLang = String(language).toLowerCase();
 
   return (
-    <div className={`code-block code-block--${normalizedLang} ${className}`}>
-      {/* Header bar with filename and copy action */}
-      <div className="code-block__header">
-        <div className="code-block__info">
-          <span className="code-block__filename">{filename}</span>
-          <span className={`code-block__lang code-block__lang--${normalizedLang}`}>
+    <div
+      className={`cb cb--${normalizedLang} ${
+        isLight ? "cb--light" : "cb--dark"
+      } ${className}`}
+    >
+      {/* Header Bar */}
+      <div className="cb__header">
+        <div className="cb__info">
+          <span className="cb__filename">{filename}</span>
+          <span className={`cb__badge cb__badge--${normalizedLang}`}>
             {normalizedLang}
           </span>
         </div>
 
         <button
           type="button"
-          className="code-block__copy-btn"
+          className="cb__copy-btn"
           onClick={handleCopy}
           aria-label="Copy code to clipboard"
         >
           {copied ? (
-            <span className="code-block__copied">
+            <span className="cb__copied-text">
               <svg
                 width="13"
                 height="13"
@@ -56,7 +80,7 @@ function CodeBlock({
               Copied!
             </span>
           ) : (
-            <span className="code-block__copy">
+            <span className="cb__copy-text">
               <svg
                 width="13"
                 height="13"
@@ -76,140 +100,163 @@ function CodeBlock({
         </button>
       </div>
 
-      {/* Code viewport container */}
-      <div className="code-block__content">
-        <pre className="code-block__pre">
+      {/* Code Container Viewport */}
+      <div className="cb__viewport">
+        <pre className="cb__pre">
           <code className={`language-${normalizedLang}`}>{code}</code>
         </pre>
       </div>
 
       <style>{`
-        .code-block {
-          width: 100%;
-          margin: 14px 0;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 4px;
-          background: var(--surface, #11151c);
-          overflow: hidden;
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        /* CodeBlock High-Contrast Color Variables */
+        .cb--dark {
+          --cb-bg: #0f172a;
+          --cb-header-bg: #1e293b;
+          --cb-border: #334155;
+          --cb-text: #f8fafc;
+          --cb-filename-text: #e2e8f0;
+          --cb-muted: #94a3b8;
+          --cb-accent: #38bdf8;
         }
 
-        .code-block__header {
+        .cb--light {
+          --cb-bg: #ffffff;
+          --cb-header-bg: #f1f5f9;
+          --cb-border: #cbd5e1;
+          --cb-text: #0f172a;
+          --cb-filename-text: #1e293b;
+          --cb-muted: #64748b;
+          --cb-accent: #0284c7;
+        }
+
+        .cb {
+          width: 100%;
+          margin: 1rem 0;
+          border: 1px solid var(--cb-border);
+          border-radius: 8px;
+          background-color: var(--cb-bg);
+          overflow: hidden;
+          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+          transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* Top Bar Header */
+        .cb__header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 8px 14px;
-          border-bottom: 1px solid var(--border, #1a202c);
-          background: var(--surface-soft, #171d26);
+          background-color: var(--cb-header-bg);
+          border-bottom: 1px solid var(--cb-border);
         }
 
-        .code-block__info {
+        .cb__info {
           display: flex;
           align-items: center;
           gap: 10px;
         }
 
-        .code-block__filename {
+        .cb__filename {
           font-size: 12px;
-          font-weight: 600;
-          color: var(--text, #f0f4f8);
+          font-weight: 700;
+          color: var(--cb-filename-text);
         }
 
-        .code-block__lang {
+        .cb__badge {
           font-size: 10px;
           font-weight: 700;
-          padding: 2px 7px;
-          border-radius: 3px;
+          padding: 2px 6px;
+          border-radius: 4px;
           text-transform: uppercase;
-          letter-spacing: 0.04em;
-          background: rgba(99, 102, 241, 0.12);
-          color: #a5b4fc;
-          border: 1px solid rgba(99, 102, 241, 0.25);
+          letter-spacing: 0.05em;
+          background: rgba(2, 132, 199, 0.15);
+          color: var(--cb-accent);
+          border: 1px solid rgba(2, 132, 199, 0.3);
         }
 
-        /* Language Specific Badge Accents */
-        .code-block__lang--java,
-        .code-block__lang--xml {
-          background: rgba(16, 185, 129, 0.12);
-          color: #6ee7b7;
-          border-color: rgba(16, 185, 129, 0.25);
+        .cb__badge--java,
+        .cb__badge--xml {
+          background: rgba(5, 150, 105, 0.15);
+          color: #34d399;
+          border-color: rgba(5, 150, 105, 0.3);
         }
 
-        .code-block__lang--sql {
-          background: rgba(245, 158, 11, 0.12);
-          color: #fcd34d;
-          border-color: rgba(245, 158, 11, 0.25);
+        .cb__badge--sql {
+          background: rgba(217, 119, 6, 0.15);
+          color: #fbbf24;
+          border-color: rgba(217, 119, 6, 0.3);
         }
 
-        .code-block__copy-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
+        /* Copy Button */
+        .cb__copy-btn {
+          background: transparent;
+          border: 1px solid var(--cb-border);
+          border-radius: 6px;
           padding: 4px 10px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 3px;
-          background: var(--surface, #11151c);
-          color: var(--muted, #8a96a8);
+          color: var(--cb-muted);
           font-size: 11px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.15s ease;
         }
 
-        .code-block__copy-btn:hover {
-          border-color: var(--theme-accent, #3b82f6);
-          color: var(--text, #f0f4f8);
-          background: var(--surface-soft, #171d26);
+        .cb__copy-btn:hover {
+          border-color: var(--cb-muted);
+          color: var(--cb-text);
+          background-color: var(--cb-border);
         }
 
-        .code-block__copy,
-        .code-block__copied {
+        .cb__copy-text,
+        .cb__copied-text {
           display: flex;
           align-items: center;
           gap: 6px;
         }
 
-        .code-block__copied {
-          color: #10b981;
+        .cb__copied-text {
+          color: #34d399;
           font-weight: 700;
         }
 
-        .code-block__content {
+        /* Code Text Viewport */
+        .cb__viewport {
           width: 100%;
           overflow-x: auto;
-          background: var(--surface, #11151c);
+          background-color: var(--cb-bg);
         }
 
-        .code-block__pre {
+        .cb__pre {
           margin: 0;
-          padding: 16px 18px;
-          font-size: 13px;
-          line-height: 1.65;
-          color: var(--text, #f0f4f8);
+          padding: 16px;
+          font-size: 13.5px;
+          line-height: 1.6;
+          color: var(--cb-text);
           white-space: pre;
           tab-size: 2;
         }
 
-        .code-block__pre code {
+        .cb__pre code {
           font-family: inherit;
+          color: var(--cb-text) !important;
+          opacity: 1 !important;
         }
 
-        /* Scrollbar styling */
-        .code-block__content::-webkit-scrollbar {
+        /* Scrollbar Styling */
+        .cb__viewport::-webkit-scrollbar {
           height: 6px;
         }
 
-        .code-block__content::-webkit-scrollbar-track {
+        .cb__viewport::-webkit-scrollbar-track {
           background: transparent;
         }
 
-        .code-block__content::-webkit-scrollbar-thumb {
-          background: var(--border-strong, #2d3748);
-          border-radius: 3px;
+        .cb__viewport::-webkit-scrollbar-thumb {
+          background: var(--cb-border);
+          border-radius: 4px;
         }
 
-        .code-block__content::-webkit-scrollbar-thumb:hover {
-          background: var(--muted, #8a96a8);
+        .cb__viewport::-webkit-scrollbar-thumb:hover {
+          background: var(--cb-muted);
         }
       `}</style>
     </div>

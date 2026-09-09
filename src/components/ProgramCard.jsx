@@ -2,6 +2,7 @@ import React from "react";
 
 function ProgramCard({
   program = {},
+  theme = "dark",
   onOpen,
   className = "",
 }) {
@@ -19,9 +20,14 @@ function ProgramCard({
     }
   };
 
+  const isAndroid = String(category).toUpperCase() === "ANDROID";
+  const isLight = theme === "light";
+
   return (
     <div
-      className={`program-card ${className}`}
+      className={`program-card ${
+        isLight ? "program-card--light" : "program-card--dark"
+      } ${className}`}
       onClick={handleClick}
       role="button"
       tabIndex={0}
@@ -34,7 +40,13 @@ function ProgramCard({
     >
       <div className="program-card__header">
         <span className="program-card__number">#{number}</span>
-        <span className="program-card__badge">{category}</span>
+        <span
+          className={`program-card__badge ${
+            isAndroid ? "program-card__badge--android" : ""
+          }`}
+        >
+          {category}
+        </span>
       </div>
 
       <div className="program-card__body">
@@ -63,54 +75,86 @@ function ProgramCard({
       </div>
 
       <style>{`
+        /* Dynamic Scoped Theme System */
+        .program-card--dark {
+          --pc-bg: var(--surface, #111720);
+          --pc-border: var(--border, #1e293b);
+          --pc-border-hover: var(--border-strong, #334155);
+          --pc-text: var(--text, #f1f5f9);
+          --pc-muted: var(--muted, #94a3b8);
+          --pc-accent: var(--accent, #0284c7);
+          --pc-badge-php-text: #38bdf8;
+          --pc-badge-php-bg: rgba(2, 132, 199, 0.15);
+          --pc-badge-android-text: #34d399;
+          --pc-badge-android-bg: rgba(5, 150, 105, 0.15);
+        }
+
+        .program-card--light {
+          --pc-bg: var(--surface, #ffffff);
+          --pc-border: var(--border, #e2e8f0);
+          --pc-border-hover: var(--border-strong, #cbd5e1);
+          --pc-text: var(--text, #0f172a);
+          --pc-muted: var(--muted, #64748b);
+          --pc-accent: var(--accent, #0284c7);
+          --pc-badge-php-text: #0284c7;
+          --pc-badge-php-bg: rgba(2, 132, 199, 0.08);
+          --pc-badge-android-text: #059669;
+          --pc-badge-android-bg: rgba(5, 150, 105, 0.08);
+        }
+
         .program-card {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding: 20px;
-          border: 1px solid var(--border, #1e2631);
-          border-radius: 12px;
-          background: var(--surface, #11151c);
+          padding: 1.25rem;
+          border: 1px solid var(--pc-border);
+          border-radius: 10px;
+          background-color: var(--pc-bg);
           cursor: pointer;
           outline: none;
-          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
           user-select: none;
         }
 
         .program-card:hover {
-          border-color: var(--accent, #3b82f6);
-          background: var(--surface-soft, #161b24);
+          border-color: var(--pc-border-hover);
           transform: translateY(-2px);
-          box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.1);
         }
 
         .program-card:focus-visible {
-          box-shadow: 0 0 0 2px var(--bg, #0d0f12), 0 0 0 4px var(--accent, #3b82f6);
+          border-color: var(--pc-accent);
+          box-shadow: 0 0 0 2px var(--pc-accent);
         }
 
         .program-card__header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 14px;
+          margin-bottom: 0.85rem;
         }
 
         .program-card__number {
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--accent, #3b82f6);
+          font-family: ui-monospace, SFMono-Regular, monospace;
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--pc-accent);
         }
 
         .program-card__badge {
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+          font-family: ui-monospace, SFMono-Regular, monospace;
           font-size: 10px;
-          font-weight: 500;
-          color: var(--muted, #94a3b8);
-          background: var(--surface-soft, #1a202c);
-          padding: 3px 8px;
+          font-weight: 700;
+          color: var(--pc-badge-php-text);
+          background-color: var(--pc-badge-php-bg);
+          padding: 2px 7px;
           border-radius: 4px;
-          border: 1px solid var(--border, #1e2631);
+          text-transform: uppercase;
+        }
+
+        .program-card__badge--android {
+          color: var(--pc-badge-android-text);
+          background-color: var(--pc-badge-android-bg);
         }
 
         .program-card__body {
@@ -118,18 +162,18 @@ function ProgramCard({
         }
 
         .program-card__title {
-          margin: 0 0 8px 0;
-          font-size: 16px;
-          font-weight: 600;
+          margin: 0 0 0.5rem 0;
+          font-size: 1.05rem;
+          font-weight: 700;
           line-height: 1.35;
-          color: var(--text, #f0f4f8);
+          color: var(--pc-text);
         }
 
         .program-card__description {
           margin: 0;
-          font-size: 13px;
-          line-height: 1.6;
-          color: var(--muted, #94a3b8);
+          font-size: 0.85rem;
+          line-height: 1.5;
+          color: var(--pc-muted);
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
@@ -137,27 +181,27 @@ function ProgramCard({
         }
 
         .program-card__footer {
-          margin-top: 18px;
-          padding-top: 14px;
-          border-top: 1px solid var(--border, #1e2631);
+          margin-top: 1.25rem;
+          padding-top: 0.75rem;
+          border-top: 1px solid var(--pc-border);
         }
 
         .program-card__link {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          font-size: 12px;
-          font-weight: 500;
-          color: var(--text, #f0f4f8);
+          font-size: 0.825rem;
+          font-weight: 600;
+          color: var(--pc-text);
           transition: color 0.15s ease;
         }
 
         .program-card__arrow {
-          transition: transform 0.2s ease;
+          transition: transform 0.15s ease;
         }
 
         .program-card:hover .program-card__link {
-          color: var(--accent, #3b82f6);
+          color: var(--pc-accent);
         }
 
         .program-card:hover .program-card__arrow {

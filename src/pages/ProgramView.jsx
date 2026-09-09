@@ -3,7 +3,7 @@ import CodeBlock from "../components/CodeBlock";
 import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
 
-// Helper function to split multi-file code strings into separate code blocks
+// Split multi-file code blocks cleanly
 function parseCodeBlocks(rawCode, defaultLang, defaultFile) {
   if (!rawCode) return [];
 
@@ -21,8 +21,8 @@ function parseCodeBlocks(rawCode, defaultLang, defaultFile) {
     const endIndex = i + 1 < matches.length ? matches[i + 1].index : rawCode.length;
 
     let blockCode = rawCode.slice(startIndex, endIndex).trim();
-
     const ext = filename.split(".").pop().toLowerCase();
+    
     let language = defaultLang;
     if (ext === "xml") language = "xml";
     if (ext === "java") language = "java";
@@ -49,12 +49,13 @@ function ProgramView({
   className = "",
 }) {
   const currentProgram = selectedProgram || programs[0];
+  const isLight = theme === "light";
 
   const categoryUpper = String(currentProgram?.category || "").toUpperCase();
   const isAndroid = categoryUpper === "ANDROID";
   const isMySQL = categoryUpper === "MYSQL";
 
-  // Filter practicals so Android view ONLY shows Android practicals
+  // Filter practicals so category views remain strictly isolated
   const activeCategoryPrograms = useMemo(() => {
     if (isAndroid) {
       return programs.filter((p) => String(p.category).toUpperCase() === "ANDROID");
@@ -66,98 +67,92 @@ function ProgramView({
   }, [programs, isAndroid]);
 
   const currentIndex = activeCategoryPrograms.findIndex(
-    (program) => String(program?.id) === String(currentProgram?.id)
+    (p) => String(p?.id) === String(currentProgram?.id)
   );
 
-  const previousProgram =
-    currentIndex > 0 ? activeCategoryPrograms[currentIndex - 1] : null;
-
-  const nextProgram =
-    currentIndex >= 0 && currentIndex < activeCategoryPrograms.length - 1
-      ? activeCategoryPrograms[currentIndex + 1]
-      : null;
+  const previousProgram = currentIndex > 0 ? activeCategoryPrograms[currentIndex - 1] : null;
+  const nextProgram = currentIndex >= 0 && currentIndex < activeCategoryPrograms.length - 1 ? activeCategoryPrograms[currentIndex + 1] : null;
 
   const handleSelectProgram = (programId) => {
     if (typeof onSelectProgram === "function") {
       onSelectProgram(programId);
     }
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   if (!currentProgram) {
     return (
-      <main className="program-view-empty">
-        <div className="program-view-empty__box">
-          <span>Practical Workspace</span>
-          <h1>Practical not found</h1>
-          <p>The selected practical is unavailable.</p>
-          <button type="button" onClick={onClose}>
-            Back to practicals
+      <main className={`pv-empty ${isLight ? "pv-empty--light" : "pv-empty--dark"}`}>
+        <div className="pv-empty__card">
+          <span className="pv-empty__tag">CS Workspace</span>
+          <h1>Practical Not Found</h1>
+          <p>The practical you are looking for is unavailable.</p>
+          <button type="button" onClick={onClose} className="pv-btn">
+            Return to Overview
           </button>
         </div>
 
         <style>{`
-          .program-view-empty {
+          .pv-empty--dark {
+            --pve-bg: #090d12;
+            --pve-panel: #111720;
+            --pve-border: #1e293b;
+            --pve-text: #f1f5f9;
+            --pve-muted: #94a3b8;
+          }
+          .pv-empty--light {
+            --pve-bg: #f8fafc;
+            --pve-panel: #ffffff;
+            --pve-border: #e2e8f0;
+            --pve-text: #0f172a;
+            --pve-muted: #64748b;
+          }
+          .pv-empty {
             min-height: 100vh;
             display: grid;
             place-items: center;
-            padding: 24px;
-            background: var(--bg, #090b0e);
-            color: var(--text, #f0f4f8);
+            padding: 2rem;
+            background: var(--pve-bg);
+            color: var(--pve-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           }
-
-          .program-view-empty__box {
-            width: min(400px, 100%);
-            padding: 28px;
-            border: 1px solid var(--border, #1a202c);
-            border-radius: 2px;
-            background: var(--surface, #11151c);
+          .pv-empty__card {
+            max-width: 400px;
+            width: 100%;
+            padding: 2rem;
+            border: 1px solid var(--pve-border);
+            border-radius: 8px;
+            background: var(--pve-panel);
             text-align: center;
           }
-
-          .program-view-empty__box span {
-            color: var(--accent, #3b82f6);
-            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+          .pv-empty__tag {
+            color: #0284c7;
+            font-family: ui-monospace, SFMono-Regular, monospace;
             font-size: 11px;
-            text-transform: uppercase;
-          }
-
-          .program-view-empty h1 {
-            margin-top: 10px;
-            font-size: 22px;
             font-weight: 700;
+            letter-spacing: 0.05em;
           }
-
-          .program-view-empty p {
-            margin-top: 8px;
-            color: var(--muted, #8a96a8);
-            font-size: 13px;
+          .pv-empty h1 {
+            font-size: 1.5rem;
+            margin: 0.75rem 0 0.5rem;
           }
-
-          .program-view-empty button {
-            margin-top: 20px;
-            height: 38px;
-            padding: 0 16px;
-            border: 1px solid var(--border-strong, #2d3748);
-            border-radius: 2px;
-            background: var(--surface-soft, #171d26);
-            color: var(--text, #f0f4f8);
-            cursor: pointer;
+          .pv-empty p {
+            color: var(--pve-muted);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+          }
+          .pv-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--pve-border);
+            border-radius: 6px;
+            background: var(--pve-bg);
+            color: var(--pve-text);
             font-weight: 600;
-          }
-
-          .program-view-empty button:hover {
-            border-color: var(--accent, #3b82f6);
+            cursor: pointer;
           }
         `}</style>
       </main>
@@ -166,7 +161,6 @@ function ProgramView({
 
   const {
     number = "01",
-    category = "PHP",
     title = "",
     shortDescription = "",
     aim = "",
@@ -178,37 +172,56 @@ function ProgramView({
   } = currentProgram;
 
   const defaultLanguage = isAndroid ? "java" : isMySQL ? "sql" : "php";
-  const defaultFilename = isAndroid
-    ? "MainActivity.java"
-    : isMySQL
-    ? "query.sql"
-    : "index.php";
-
+  const defaultFilename = isAndroid ? "MainActivity.java" : isMySQL ? "query.sql" : "index.php";
   const parsedBlocks = parseCodeBlocks(code, defaultLanguage, defaultFilename);
 
   return (
-    <main className={`program-view ${isAndroid ? "program-view--android" : ""} ${className}`}>
-      {/* Header Bar */}
-      <header className="program-view__topbar">
-        <div className="program-view__topbar-inner">
-          <div className="program-view__brand">
+    <div
+      className={`pv ${isLight ? "pv--light" : "pv--dark"} ${
+        isAndroid ? "pv--android" : ""
+      } ${className}`}
+    >
+      {/* Top Header Bar */}
+      <header className="pv-header">
+        <div className="pv-header__inner">
+          <div className="pv-brand">
+            <button
+              type="button"
+              className="pv-back-btn"
+              onClick={onClose}
+              title="Back to Practicals List"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </button>
             <Logo compact />
-            <span className="program-view__brand-divider" />
-            <span className="program-view__brand-context">
-              {isAndroid ? "Android Lab" : "PHP & MySQL Lab"}
+            <span className="pv-brand__divider">/</span>
+            <span className="pv-brand__label">
+              {isAndroid ? "Android Lab Workspace" : "PHP & MySQL Workspace"}
             </span>
           </div>
 
-          <div className="program-view__actions">
-            <span className="program-view__counter">
-              {number} / {String(activeCategoryPrograms.length).padStart(2, "0")}
+          <div className="pv-actions">
+            <span className="pv-counter">
+              Module {number} / {String(activeCategoryPrograms.length).padStart(2, "0")}
             </span>
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
             <button
               type="button"
-              className="program-view__close"
+              className="pv-close-btn"
               onClick={onClose}
-              aria-label="Close practical"
+              aria-label="Close practical view"
             >
               Close
             </button>
@@ -216,53 +229,44 @@ function ProgramView({
         </div>
       </header>
 
-      <div className="program-view__layout">
-        {/* Sidebar - Strictly filtered to current category */}
-        <aside className="program-view__sidebar">
-          <span className="program-view__sidebar-label">
-            {isAndroid ? "Android Practicals" : "PHP & MySQL Practicals"}
-          </span>
-          <div className="program-view__program-list">
+      {/* Main Workspace Container */}
+      <div className="pv-container">
+        {/* Sidebar Practical List (Desktop) */}
+        <aside className="pv-sidebar">
+          <div className="pv-sidebar__header">
+            <span>{isAndroid ? "Android Modules" : "PHP Modules"}</span>
+          </div>
+          <div className="pv-sidebar__list">
             {activeCategoryPrograms.map((program) => {
               const isActive = String(program.id) === String(currentProgram.id);
               return (
                 <button
                   type="button"
                   key={program.id}
-                  className={`program-view__program ${
-                    isActive ? "program-view__program--active" : ""
-                  }`}
-                  aria-current={isActive ? "true" : undefined}
+                  className={`pv-sidebar__item ${isActive ? "pv-sidebar__item--active" : ""}`}
                   onClick={() => handleSelectProgram(program.id)}
                 >
-                  <span className="program-view__program-number">
-                    {program.number}
-                  </span>
-                  <span className="program-view__program-name">
-                    {program.title}
-                  </span>
+                  <span className="pv-sidebar__num">{program.number}</span>
+                  <span className="pv-sidebar__title">{program.title}</span>
                 </button>
               );
             })}
           </div>
         </aside>
 
-        {/* Main Content Viewport */}
-        <article className="program-view__content">
-          {/* Mobile Horizontal Selector */}
-          <div className="program-view__mobile-programs">
-            <span className="program-view__mobile-label">Select Practical</span>
-            <div className="program-view__mobile-list">
+        {/* Viewport Content Column */}
+        <main className="pv-content">
+          {/* Horizontal Selector (Mobile View) */}
+          <div className="pv-mobile-nav">
+            <span className="pv-mobile-nav__label">Select Practical</span>
+            <div className="pv-mobile-nav__scroller">
               {activeCategoryPrograms.map((program) => {
                 const isActive = String(program.id) === String(currentProgram.id);
                 return (
                   <button
                     type="button"
                     key={program.id}
-                    className={`program-view__mobile-button ${
-                      isActive ? "program-view__mobile-button--active" : ""
-                    }`}
-                    aria-current={isActive ? "true" : undefined}
+                    className={`pv-mobile-chip ${isActive ? "pv-mobile-chip--active" : ""}`}
                     onClick={() => handleSelectProgram(program.id)}
                   >
                     P{program.number}
@@ -272,108 +276,76 @@ function ProgramView({
             </div>
           </div>
 
-          {/* Intro Section */}
-          <header className="program-view__intro">
-            <div className="program-view__eyebrow">
+          {/* Practical Introduction */}
+          <section className="pv-hero">
+            <div className="pv-badge">
               <span>Practical {number}</span>
-              <span className="program-view__divider" />
-              <span className="program-view__category-tag">
-                {isAndroid ? "Android" : isMySQL ? "MySQL" : "PHP"}
-              </span>
+              <span className="pv-badge__dot">•</span>
+              <span>{isAndroid ? "Android" : isMySQL ? "MySQL" : "PHP"}</span>
             </div>
 
-            <h1 className="program-view__title">{title}</h1>
-            <p className="program-view__description">{shortDescription}</p>
+            <h1 className="pv-title">{title}</h1>
+            <p className="pv-description">{shortDescription}</p>
 
-            {/* Quick Navigation Anchor Bar */}
-            <div className="program-view__quick-nav">
-              <button
-                type="button"
-                className="program-view__quick-button"
-                onClick={() => scrollToSection("aim")}
-              >
-                Aim
-              </button>
-              <button
-                type="button"
-                className="program-view__quick-button"
-                onClick={() => scrollToSection("algorithm")}
-              >
-                Algorithm
-              </button>
-              <button
-                type="button"
-                className="program-view__quick-button"
-                onClick={() => scrollToSection("code")}
-              >
-                Code
-              </button>
-              <button
-                type="button"
-                className="program-view__quick-button"
-                onClick={() => scrollToSection("output")}
-              >
-                Output
-              </button>
+            {/* Quick Navigation Anchors */}
+            <div className="pv-anchors">
+              <button type="button" onClick={() => scrollToSection("aim")}>Aim</button>
+              <button type="button" onClick={() => scrollToSection("algorithm")}>Algorithm</button>
+              <button type="button" onClick={() => scrollToSection("code")}>Code</button>
+              <button type="button" onClick={() => scrollToSection("output")}>Output</button>
               {examTips.length > 0 && (
-                <button
-                  type="button"
-                  className="program-view__quick-button"
-                  onClick={() => scrollToSection("exam")}
-                >
-                  Exam tips
-                </button>
+                <button type="button" onClick={() => scrollToSection("exam")}>Exam Tips</button>
               )}
             </div>
-          </header>
+          </section>
 
           {/* Aim Section */}
-          <section id="aim" className="program-view__section">
-            <span className="program-view__label">Aim</span>
-            <p className="program-view__aim">{aim}</p>
+          <section id="aim" className="pv-section">
+            <h2 className="pv-section__label">Aim</h2>
+            <div className="pv-card">
+              <p className="pv-aim-text">{aim}</p>
+            </div>
           </section>
 
           {/* Algorithm Section */}
-          <section id="algorithm" className="program-view__section">
-            <span className="program-view__label">Algorithm</span>
-            <div className="program-view__algorithm">
-              {algorithm.map((step, index) => (
-                <div key={index} className="program-view__algorithm-row">
-                  <span className="program-view__step-number">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="program-view__step-text">{step}</span>
-                </div>
-              ))}
+          <section id="algorithm" className="pv-section">
+            <h2 className="pv-section__label">Algorithm</h2>
+            <div className="pv-card">
+              <div className="pv-steps">
+                {algorithm.map((step, index) => (
+                  <div key={index} className="pv-step-row">
+                    <span className="pv-step-idx">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="pv-step-val">{step}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
 
           {/* Source Code Section */}
-          <section id="code" className="program-view__section">
-            <span className="program-view__label">Source Code</span>
-            <div className="program-view__code-container">
+          <section id="code" className="pv-section">
+            <h2 className="pv-section__label">Source Code</h2>
+            <div className="pv-code-stack">
               {parsedBlocks.map((block, index) => (
-                <div key={index} className="program-view__code-block-wrapper">
-                  <CodeBlock
-                    code={block.code}
-                    language={block.language}
-                    filename={block.filename}
-                  />
-                </div>
+                <CodeBlock
+                  key={index}
+                  code={block.code}
+                  language={block.language}
+                  filename={block.filename}
+                  theme={theme}
+                />
               ))}
             </div>
           </section>
 
-          {/* Output Section */}
-          <section id="output" className="program-view__section">
-            <span className="program-view__label">Expected Output</span>
-            <div className="program-view__output">
-              <div className="program-view__output-header">
-                <span className="program-view__output-title">
-                  {isAndroid ? "Device Screen / Logcat" : "Console / Browser output"}
-                </span>
+          {/* Expected Output Section */}
+          <section id="output" className="pv-section">
+            <h2 className="pv-section__label">Expected Output</h2>
+            <div className="pv-card pv-output-card">
+              <div className="pv-output-header">
+                <span>{isAndroid ? "Device Screen View / Logcat" : "Console Output"}</span>
               </div>
-              <pre>
+              <pre className="pv-output-code">
                 <code>{output}</code>
               </pre>
             </div>
@@ -381,577 +353,530 @@ function ProgramView({
 
           {/* How It Works Section */}
           {howItWorks.length > 0 && (
-            <section className="program-view__section">
-              <span className="program-view__label">How it works</span>
-              <div className="program-view__list">
-                {howItWorks.map((item, index) => (
-                  <div key={index} className="program-view__list-row">
-                    <span className="program-view__step-number">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="program-view__step-text">{item}</span>
-                  </div>
-                ))}
+            <section className="pv-section">
+              <h2 className="pv-section__label">How It Works</h2>
+              <div className="pv-card">
+                <div className="pv-steps">
+                  {howItWorks.map((item, index) => (
+                    <div key={index} className="pv-step-row">
+                      <span className="pv-step-idx">{String(index + 1).padStart(2, "0")}</span>
+                      <span className="pv-step-val">{item}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
           )}
 
           {/* Exam Tips Section */}
           {examTips.length > 0 && (
-            <section id="exam" className="program-view__exam">
-              <span className="program-view__label">Exam tips</span>
-              <div className="program-view__exam-list">
-                {examTips.map((tip, index) => (
-                  <div key={index} className="program-view__exam-row">
-                    <span className="program-view__exam-mark">✓</span>
-                    <span className="program-view__exam-text">{tip}</span>
-                  </div>
-                ))}
+            <section id="exam" className="pv-section">
+              <h2 className="pv-section__label">Exam Tips & Guidance</h2>
+              <div className="pv-card pv-exam-card">
+                <div className="pv-exam-list">
+                  {examTips.map((tip, index) => (
+                    <div key={index} className="pv-exam-item">
+                      <span className="pv-exam-bullet">✓</span>
+                      <span>{tip}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
           )}
 
-          {/* Navigation Controls */}
-          <div className="program-view__navigation">
+          {/* Footer Navigation Buttons */}
+          <nav className="pv-footer-nav" aria-label="Practical pagination">
             <button
               type="button"
-              className="program-view__navigation-button"
+              className="pv-nav-btn"
               disabled={!previousProgram}
-              onClick={() =>
-                previousProgram && handleSelectProgram(previousProgram.id)
-              }
+              onClick={() => previousProgram && handleSelectProgram(previousProgram.id)}
             >
-              <span className="program-view__navigation-label">
-                Previous practical
-              </span>
-              <span className="program-view__navigation-title">
-                {previousProgram
-                  ? `${previousProgram.number} · ${previousProgram.title}`
-                  : "First practical"}
+              <span className="pv-nav-btn__sub">Previous Practical</span>
+              <span className="pv-nav-btn__title">
+                {previousProgram ? `${previousProgram.number} · ${previousProgram.title}` : "None"}
               </span>
             </button>
 
             <button
               type="button"
-              className="program-view__navigation-button program-view__navigation-button--next"
+              className="pv-nav-btn pv-nav-btn--next"
               disabled={!nextProgram}
-              onClick={() =>
-                nextProgram && handleSelectProgram(nextProgram.id)
-              }
+              onClick={() => nextProgram && handleSelectProgram(nextProgram.id)}
             >
-              <span className="program-view__navigation-label">
-                Next practical
-              </span>
-              <span className="program-view__navigation-title">
-                {nextProgram
-                  ? `${nextProgram.number} · ${nextProgram.title}`
-                  : "Last practical"}
+              <span className="pv-nav-btn__sub">Next Practical</span>
+              <span className="pv-nav-btn__title">
+                {nextProgram ? `${nextProgram.number} · ${nextProgram.title}` : "None"}
               </span>
             </button>
-          </div>
-        </article>
+          </nav>
+        </main>
       </div>
 
       <style>{`
-        .program-view {
+        .pv--dark {
+          --pv-bg: #090d12;
+          --pv-panel: #111720;
+          --pv-panel-hover: #1c2433;
+          --pv-text: #f1f5f9;
+          --pv-muted: #94a3b8;
+          --pv-border: #1e293b;
+          --pv-accent: #38bdf8;
+        }
+
+        .pv--light {
+          --pv-bg: #f8fafc;
+          --pv-panel: #ffffff;
+          --pv-panel-hover: #f1f5f9;
+          --pv-text: #0f172a;
+          --pv-muted: #64748b;
+          --pv-border: #e2e8f0;
+          --pv-accent: #0284c7;
+        }
+
+        .pv {
           min-height: 100vh;
-          width: 100%;
-          overflow-x: hidden;
-          background: var(--bg, #090b0e);
-          color: var(--text, #f0f4f8);
-          font-family: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
-
-          --theme-accent: #3b82f6;
+          background-color: var(--pv-bg);
+          color: var(--pv-text);
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        .program-view--android {
-          --theme-accent: #10b981;
+        .pv--android {
+          --pv-accent: #34d399;
         }
 
-        .program-view__topbar {
+        .pv-header {
           position: sticky;
           top: 0;
-          z-index: 50;
-          width: 100%;
-          border-bottom: 1px solid var(--border, #1a202c);
-          background: var(--bg, #090b0e);
+          z-index: 40;
+          background: var(--pv-panel);
+          border-bottom: 1px solid var(--pv-border);
+          transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
-        .program-view__topbar-inner {
-          width: min(1180px, calc(100% - 32px));
-          height: 60px;
+        .pv-header__inner {
+          max-width: 1200px;
           margin: 0 auto;
+          padding: 0.75rem 1.5rem;
           display: flex;
           align-items: center;
           justify-content: space-between;
         }
 
-        .program-view__brand {
+        .pv-brand {
           display: flex;
           align-items: center;
-          gap: 12px;
-          min-width: 0;
+          gap: 10px;
         }
 
-        .program-view__brand-divider {
-          width: 1px;
-          height: 16px;
-          background: var(--border, #1a202c);
-        }
-
-        .program-view__brand-context {
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 11px;
-          color: var(--muted, #8a96a8);
-          white-space: nowrap;
-          text-transform: uppercase;
-        }
-
-        .program-view__actions {
-          display: flex;
+        .pv-back-btn {
+          display: inline-flex;
           align-items: center;
-          gap: 12px;
-          flex-shrink: 0;
-        }
-
-        .program-view__counter {
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 11px;
-          color: var(--muted, #8a96a8);
-        }
-
-        .program-view__close {
-          height: 34px;
-          padding: 0 14px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 2px;
-          background: var(--surface, #11151c);
-          color: var(--text, #f0f4f8);
-          font-size: 11px;
-          font-weight: 600;
+          justify-content: center;
+          padding: 5px;
+          border: 1px solid var(--pv-border);
+          border-radius: 6px;
+          background: transparent;
+          color: var(--pv-muted);
           cursor: pointer;
           transition: all 0.15s ease;
         }
 
-        .program-view__close:hover {
-          border-color: var(--theme-accent);
-          background: var(--surface-soft, #171d26);
+        .pv-back-btn:hover {
+          color: var(--pv-text);
+          border-color: var(--pv-muted);
+          background: var(--pv-panel-hover);
         }
 
-        .program-view__layout {
-          width: min(1180px, calc(100% - 32px));
+        .pv-brand__divider {
+          color: var(--pv-muted);
+          opacity: 0.4;
+        }
+
+        .pv-brand__label {
+          font-family: ui-monospace, SFMono-Regular, monospace;
+          font-size: 11px;
+          font-weight: 600;
+          color: var(--pv-muted);
+          text-transform: uppercase;
+        }
+
+        .pv-actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .pv-counter {
+          font-family: ui-monospace, SFMono-Regular, monospace;
+          font-size: 11px;
+          color: var(--pv-muted);
+        }
+
+        .pv-close-btn {
+          background: transparent;
+          border: 1px solid var(--pv-border);
+          color: var(--pv-text);
+          padding: 5px 12px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.15s ease;
+        }
+
+        .pv-close-btn:hover {
+          background: var(--pv-panel-hover);
+        }
+
+        .pv-container {
+          max-width: 1200px;
           margin: 0 auto;
+          padding: 2rem 1.5rem 4rem;
           display: grid;
-          grid-template-columns: 240px minmax(0, 1fr);
-          gap: 36px;
-          padding: 36px 0 80px;
+          grid-template-columns: 260px 1fr;
+          gap: 2.5rem;
         }
 
-        .program-view__content {
-          min-width: 0;
-          width: 100%;
-        }
-
-        .program-view__sidebar {
+        .pv-sidebar {
           position: sticky;
           top: 80px;
-          align-self: start;
+          height: fit-content;
         }
 
-        .program-view__sidebar-label {
-          display: block;
-          margin-bottom: 10px;
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 10px;
-          color: var(--muted, #8a96a8);
+        .pv-sidebar__header {
+          font-family: ui-monospace, SFMono-Regular, monospace;
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--pv-muted);
           text-transform: uppercase;
-          letter-spacing: 0.04em;
+          margin-bottom: 0.75rem;
         }
 
-        .program-view__program-list {
-          display: flex;
-          flex-direction: column;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 2px;
-          background: var(--surface, #11151c);
-          max-height: calc(100vh - 120px);
+        .pv-sidebar__list {
+          background: var(--pv-panel);
+          border: 1px solid var(--pv-border);
+          border-radius: 8px;
+          overflow: hidden;
+          max-height: calc(100vh - 140px);
           overflow-y: auto;
         }
 
-        .program-view__program {
-          position: relative;
+        .pv-sidebar__item {
+          width: 100%;
           display: flex;
           align-items: center;
           gap: 10px;
-          padding: 11px 14px;
-          border: 0;
-          border-bottom: 1px solid var(--border, #1a202c);
+          padding: 10px 12px;
           background: transparent;
-          color: var(--muted, #8a96a8);
-          font-size: 12px;
-          font-weight: 500;
+          border: none;
+          border-bottom: 1px solid var(--pv-border);
+          color: var(--pv-muted);
+          font-size: 13px;
           text-align: left;
           cursor: pointer;
-          transition: all 0.15s ease;
+          transition: background-color 0.15s ease, color 0.15s ease;
         }
 
-        .program-view__program:last-child {
-          border-bottom: 0;
+        .pv-sidebar__item:last-child {
+          border-bottom: none;
         }
 
-        .program-view__program:hover {
-          background: var(--surface-soft, #171d26);
-          color: var(--text, #f0f4f8);
+        .pv-sidebar__item:hover {
+          background: var(--pv-panel-hover);
+          color: var(--pv-text);
         }
 
-        .program-view__program--active {
-          background: var(--surface-soft, #171d26) !important;
-          color: #ffffff !important;
+        .pv-sidebar__item--active {
+          background: var(--pv-panel-hover);
+          color: var(--pv-text);
           font-weight: 600;
         }
 
-        .program-view__program--active::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          top: 6px;
-          bottom: 6px;
-          width: 3px;
-          background: var(--theme-accent);
-        }
-
-        .program-view__program-number {
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        .pv-sidebar__num {
+          font-family: ui-monospace, SFMono-Regular, monospace;
           font-size: 11px;
-          color: var(--theme-accent);
-        }
-
-        .program-view__program-name {
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-        }
-
-        .program-view__mobile-programs {
-          display: none;
-        }
-
-        .program-view__eyebrow {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 11px;
-          color: var(--theme-accent);
-        }
-
-        .program-view__category-tag {
-          font-weight: 600;
-        }
-
-        .program-view__divider {
-          width: 12px;
-          height: 1px;
-          background: var(--border-strong, #2d3748);
-        }
-
-        .program-view__title {
-          margin: 10px 0 0 0;
-          font-size: clamp(22px, 4vw, 38px);
-          font-weight: 800;
-          line-height: 1.25;
-          letter-spacing: -0.02em;
-          overflow-wrap: break-word;
-          word-break: break-word;
-        }
-
-        .program-view__description {
-          margin: 10px 0 0 0;
-          font-size: 14px;
-          line-height: 1.6;
-          color: var(--muted, #8a96a8);
-          overflow-wrap: break-word;
-        }
-
-        .program-view__quick-nav {
-          display: flex;
-          gap: 8px;
-          margin-top: 20px;
-          overflow-x: auto;
-          padding-bottom: 4px;
-          scrollbar-width: none;
-        }
-
-        .program-view__quick-nav::-webkit-scrollbar {
-          display: none;
-        }
-
-        .program-view__quick-button {
-          padding: 6px 12px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 2px;
-          background: var(--surface, #11151c);
-          color: var(--muted, #8a96a8);
-          font-size: 11px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          white-space: nowrap;
-          flex-shrink: 0;
-        }
-
-        .program-view__quick-button:hover {
-          border-color: var(--theme-accent);
-          color: var(--text, #f0f4f8);
-        }
-
-        .program-view__section {
-          padding-top: 32px;
-          scroll-margin-top: 70px;
-        }
-
-        .program-view__label {
-          display: block;
-          margin-bottom: 10px;
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 11px;
-          font-weight: 600;
-          color: var(--theme-accent);
-          text-transform: uppercase;
-        }
-
-        .program-view__code-container {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .program-view__aim {
-          margin: 0;
-          font-size: 14px;
-          line-height: 1.7;
-          color: var(--text, #f0f4f8);
-          overflow-wrap: break-word;
-        }
-
-        .program-view__algorithm {
-          border-top: 1px solid var(--border, #1a202c);
-        }
-
-        .program-view__algorithm-row,
-        .program-view__list-row {
-          display: grid;
-          grid-template-columns: 28px minmax(0, 1fr);
-          gap: 12px;
-          padding: 10px 0;
-          border-bottom: 1px solid var(--border, #1a202c);
-        }
-
-        .program-view__step-number {
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 11px;
-          color: var(--muted, #8a96a8);
-        }
-
-        .program-view__step-text {
-          font-size: 13px;
-          line-height: 1.6;
-          color: var(--text, #f0f4f8);
-          overflow-wrap: break-word;
-        }
-
-        .program-view__output {
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 2px;
-          background: var(--surface, #11151c);
-          overflow: hidden;
-        }
-
-        .program-view__output-header {
-          padding: 10px 14px;
-          border-bottom: 1px solid var(--border, #1a202c);
-          background: var(--surface-soft, #171d26);
-        }
-
-        .program-view__output-title {
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 11px;
-          color: var(--muted, #8a96a8);
-        }
-
-        .program-view__output pre {
-          margin: 0;
-          padding: 14px;
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 12px;
-          line-height: 1.7;
-          color: var(--text, #f0f4f8);
-          overflow-x: auto;
-          white-space: pre-wrap;
-          word-break: break-all;
-        }
-
-        .program-view__exam {
-          margin-top: 36px;
-          padding: 18px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 2px;
-          background: var(--surface, #11151c);
-        }
-
-        .program-view__exam-row {
-          display: flex;
-          gap: 10px;
-          padding: 8px 0;
-          border-bottom: 1px solid var(--border, #1a202c);
-        }
-
-        .program-view__exam-row:last-child {
-          border-bottom: 0;
-        }
-
-        .program-view__exam-mark {
-          color: var(--theme-accent);
-          font-size: 12px;
+          color: var(--pv-accent);
           font-weight: 700;
         }
 
-        .program-view__exam-text {
-          font-size: 13px;
-          line-height: 1.6;
-          color: var(--text, #f0f4f8);
-          overflow-wrap: break-word;
-        }
-
-        .program-view__navigation {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 14px;
-          margin-top: 40px;
-          padding-top: 20px;
-          border-top: 1px solid var(--border, #1a202c);
-        }
-
-        .program-view__navigation-button {
-          display: flex;
-          flex-direction: column;
-          padding: 12px 14px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 2px;
-          background: var(--surface, #11151c);
-          color: var(--text, #f0f4f8);
-          text-align: left;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          min-width: 0;
-        }
-
-        .program-view__navigation-button:hover:not(:disabled) {
-          border-color: var(--theme-accent);
-          background: var(--surface-soft, #171d26);
-        }
-
-        .program-view__navigation-button--next {
-          text-align: right;
-        }
-
-        .program-view__navigation-label {
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 10px;
-          color: var(--muted, #8a96a8);
-        }
-
-        .program-view__navigation-title {
-          margin-top: 4px;
-          font-size: 12px;
-          font-weight: 600;
-          overflow: hidden;
+        .pv-sidebar__title {
           white-space: nowrap;
+          overflow: hidden;
           text-overflow: ellipsis;
         }
 
-        .program-view__navigation-button:disabled {
-          opacity: 0.3;
+        .pv-content {
+          min-width: 0;
+        }
+
+        .pv-hero {
+          margin-bottom: 2rem;
+        }
+
+        .pv-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-family: ui-monospace, SFMono-Regular, monospace;
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--pv-accent);
+          margin-bottom: 0.5rem;
+        }
+
+        .pv-title {
+          font-size: clamp(1.5rem, 3vw, 2.25rem);
+          font-weight: 800;
+          line-height: 1.2;
+          margin: 0 0 0.5rem;
+        }
+
+        .pv-description {
+          color: var(--pv-muted);
+          font-size: 0.95rem;
+          line-height: 1.5;
+          margin: 0 0 1.25rem;
+        }
+
+        .pv-anchors {
+          display: flex;
+          gap: 8px;
+          overflow-x: auto;
+          padding-bottom: 4px;
+        }
+
+        .pv-anchors button {
+          background: var(--pv-panel);
+          border: 1px solid var(--pv-border);
+          color: var(--pv-muted);
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+
+        .pv-anchors button:hover {
+          color: var(--pv-text);
+          border-color: var(--pv-muted);
+        }
+
+        .pv-section {
+          margin-bottom: 2rem;
+          scroll-margin-top: 80px;
+        }
+
+        .pv-section__label {
+          font-family: ui-monospace, SFMono-Regular, monospace;
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--pv-muted);
+          text-transform: uppercase;
+          margin-bottom: 0.5rem;
+        }
+
+        .pv-card {
+          background: var(--pv-panel);
+          border: 1px solid var(--pv-border);
+          border-radius: 8px;
+          padding: 1.25rem;
+        }
+
+        .pv-aim-text {
+          margin: 0;
+          font-size: 0.95rem;
+          line-height: 1.6;
+        }
+
+        .pv-steps {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .pv-step-row {
+          display: flex;
+          gap: 12px;
+          padding: 8px 0;
+          border-bottom: 1px solid var(--pv-border);
+        }
+
+        .pv-step-row:last-child {
+          border-bottom: none;
+        }
+
+        .pv-step-idx {
+          font-family: ui-monospace, SFMono-Regular, monospace;
+          font-size: 11px;
+          color: var(--pv-accent);
+          font-weight: 700;
+        }
+
+        .pv-step-val {
+          font-size: 0.9rem;
+          line-height: 1.5;
+        }
+
+        .pv-code-stack {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .pv-output-card {
+          padding: 0;
+          overflow: hidden;
+        }
+
+        .pv-output-header {
+          background: var(--pv-panel-hover);
+          border-bottom: 1px solid var(--pv-border);
+          padding: 8px 12px;
+          font-family: ui-monospace, SFMono-Regular, monospace;
+          font-size: 11px;
+          color: var(--pv-muted);
+        }
+
+        .pv-output-code {
+          margin: 0;
+          padding: 12px;
+          font-family: ui-monospace, SFMono-Regular, monospace;
+          font-size: 12px;
+          line-height: 1.6;
+          overflow-x: auto;
+          white-space: pre-wrap;
+          color: var(--pv-text);
+        }
+
+        .pv-exam-card {
+          border-color: rgba(2, 132, 199, 0.3);
+        }
+
+        .pv-exam-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .pv-exam-item {
+          display: flex;
+          gap: 8px;
+          font-size: 0.9rem;
+          line-height: 1.5;
+        }
+
+        .pv-exam-bullet {
+          color: var(--pv-accent);
+          font-weight: 700;
+        }
+
+        .pv-footer-nav {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-top: 3rem;
+          padding-top: 1.5rem;
+          border-top: 1px solid var(--pv-border);
+        }
+
+        .pv-nav-btn {
+          background: var(--pv-panel);
+          border: 1px solid var(--pv-border);
+          border-radius: 8px;
+          padding: 12px;
+          display: flex;
+          flex-direction: column;
+          text-align: left;
+          cursor: pointer;
+          transition: border-color 0.15s ease;
+        }
+
+        .pv-nav-btn:hover:not(:disabled) {
+          border-color: var(--pv-muted);
+        }
+
+        .pv-nav-btn:disabled {
+          opacity: 0.4;
           cursor: not-allowed;
         }
 
-        @media (max-width: 850px) {
-          .program-view__topbar-inner {
-            width: calc(100% - 24px);
-            height: 54px;
-          }
+        .pv-nav-btn--next {
+          text-align: right;
+        }
 
-          .program-view__brand-context,
-          .program-view__brand-divider {
-            display: none;
-          }
+        .pv-nav-btn__sub {
+          font-family: ui-monospace, SFMono-Regular, monospace;
+          font-size: 10px;
+          color: var(--pv-muted);
+          text-transform: uppercase;
+        }
 
-          .program-view__layout {
+        .pv-nav-btn__title {
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--pv-text);
+          margin-top: 4px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .pv-mobile-nav {
+          display: none;
+        }
+
+        @media (max-width: 820px) {
+          .pv-container {
             grid-template-columns: 1fr;
-            width: calc(100% - 24px);
-            padding: 20px 0 60px;
           }
 
-          .program-view__sidebar {
+          .pv-sidebar {
             display: none;
           }
 
-          .program-view__mobile-programs {
-            display: block;
-            margin-bottom: 20px;
+          .pv-mobile-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 1.5rem;
           }
 
-          .program-view__mobile-label {
-            display: block;
-            margin-bottom: 8px;
-            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-            font-size: 10px;
-            color: var(--muted, #8a96a8);
+          .pv-mobile-nav__label {
+            font-family: ui-monospace, SFMono-Regular, monospace;
+            font-size: 11px;
+            color: var(--pv-muted);
             text-transform: uppercase;
           }
 
-          .program-view__mobile-list {
+          .pv-mobile-nav__scroller {
             display: flex;
             gap: 6px;
             overflow-x: auto;
             padding-bottom: 4px;
-            scrollbar-width: thin;
           }
 
-          .program-view__mobile-button {
+          .pv-mobile-chip {
+            background: var(--pv-panel);
+            border: 1px solid var(--pv-border);
+            color: var(--pv-muted);
             padding: 6px 12px;
-            border: 1px solid var(--border-strong, #2d3748);
-            border-radius: 2px;
-            background: var(--surface, #11151c);
-            color: var(--muted, #8a96a8);
-            font-size: 11px;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: 600;
-            cursor: pointer;
-            flex-shrink: 0;
+            white-space: nowrap;
           }
 
-          .program-view__mobile-button--active {
-            border-color: var(--theme-accent);
-            background: var(--surface-soft, #171d26);
-            color: #ffffff;
-          }
-        }
-
-        @media (max-width: 600px) {
-          .program-view__counter {
-            display: none;
-          }
-
-          .program-view__navigation {
-            grid-template-columns: 1fr;
-          }
-
-          .program-view__navigation-button--next {
-            text-align: left;
+          .pv-mobile-chip--active {
+            border-color: var(--pv-accent);
+            color: var(--pv-text);
+            background: var(--pv-panel-hover);
           }
         }
       `}</style>
-    </main>
+    </div>
   );
 }
 

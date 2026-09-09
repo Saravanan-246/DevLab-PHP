@@ -5,16 +5,16 @@ const programs = [
     title: "Operators & Variables",
     category: "PHP",
     shortDescription:
-      "Understand variables and commonly used PHP operators.",
+      "Demonstrate variables and basic operators in PHP.",
 
     aim:
-      "To demonstrate variables and different types of operators in PHP.",
+      "To demonstrate variables and basic arithmetic, assignment, comparison, logical, increment, and decrement operators in PHP.",
 
     algorithm: [
       "Declare two integer variables.",
-      "Perform arithmetic operations.",
-      "Demonstrate assignment and comparison operators.",
-      "Demonstrate logical and increment/decrement operators.",
+      "Perform arithmetic and assignment operations.",
+      "Perform comparison and logical operations.",
+      "Apply increment and decrement operators.",
       "Display the results.",
       "Stop the program.",
     ],
@@ -41,7 +41,6 @@ echo "Assignment Operator<br>";
 echo "After c += b: $c<br><br>";
 
 echo "Comparison Operators<br>";
-
 echo "a == b: ";
 echo ($a == $b) ? "True" : "False";
 echo "<br>";
@@ -105,17 +104,19 @@ After Increment: 6
 After Decrement: 5`,
 
     howItWorks: [
-      "Variables store the values 20 and 10.",
+      "The variables store the values 20 and 10.",
       "Arithmetic operators perform calculations on the values.",
+      "The assignment operator changes the value of a variable.",
       "Comparison and logical operators check conditions.",
-      "Increment and decrement change the value of a variable.",
+      "Increment increases a value by 1 and decrement decreases it by 1.",
     ],
 
     examTips: [
-      "Remember the difference between = and ==.",
+      "Remember = is assignment and == is comparison.",
       "Know the basic arithmetic operators.",
-      "Remember ++ increases a value by 1.",
-      "Remember -- decreases a value by 1.",
+      "Remember && means AND and || means OR.",
+      "Remember ++ increases by 1.",
+      "Remember -- decreases by 1.",
     ],
   },
 
@@ -125,17 +126,17 @@ After Decrement: 5`,
     title: "Registration Form",
     category: "PHP",
     shortDescription:
-      "Create a simple registration form using basic controls.",
+      "Create a student registration form using HTML and PHP POST.",
 
     aim:
-      "To create a simple registration form using basic HTML controls and PHP.",
+      "To create a simple student registration form using HTML and retrieve the submitted values using PHP $_POST.",
 
     algorithm: [
-      "Create a registration form.",
-      "Add controls for name, email, age, gender, and course.",
-      "Accept the values entered by the user.",
+      "Create a registration form using HTML.",
+      "Add fields for name, email, age, gender, and course.",
+      "Submit the form using the POST method.",
       "Check whether the form is submitted.",
-      "Retrieve the submitted values using $_POST.",
+      "Retrieve the values using $_POST.",
       "Display the registration details.",
       "Stop the program.",
     ],
@@ -151,7 +152,6 @@ if (isset($_POST["submit"])) {
     $course = $_POST["course"];
 
     echo "<h2>Registration Details</h2>";
-
     echo "Name: $name<br>";
     echo "Email: $email<br>";
     echo "Age: $age<br>";
@@ -191,7 +191,6 @@ if (isset($_POST["submit"])) {
 
     <input type="radio" name="gender" value="Female">
     Female
-
     <br><br>
 
     Course:
@@ -227,17 +226,18 @@ Gender: Male
 Course: B.Sc Computer Science`,
 
     howItWorks: [
-      "The form collects information from the user.",
+      "The HTML form collects the student's details.",
       "The POST method sends the submitted values to PHP.",
-      "PHP reads the values using $_POST.",
-      "The entered details are displayed after submission.",
+      "PHP receives the values using $_POST.",
+      "The submitted details are displayed on the page.",
     ],
 
     examTips: [
-      "Remember the form method: POST.",
-      "Know how $_POST is used.",
-      "Remember the name attribute of form controls.",
-      "Understand the purpose of the submit button.",
+      "Remember the form method is POST.",
+      "Remember $_POST is used to receive form data.",
+      "The name attribute identifies each form value.",
+      "The submit button is used to submit the form.",
+      "Remember the flow: Form → POST → $_POST → Display.",
     ],
   },
 
@@ -247,14 +247,14 @@ Course: B.Sc Computer Science`,
     title: "Decision & Loops",
     category: "PHP",
     shortDescription:
-      "Demonstrate decision-making and looping statements in PHP.",
+      "Demonstrate if-else decision-making and for loop in PHP.",
 
     aim:
-      "To demonstrate decision-making and looping statements in PHP.",
+      "To demonstrate decision-making using if-else and repetition using a for loop in PHP.",
 
     algorithm: [
       "Store a student's mark.",
-      "Use an if-else statement to check the result.",
+      "Check the mark using an if-else statement.",
       "Display PASS if the mark is 50 or above.",
       "Otherwise display FAIL.",
       "Use a for loop to display numbers from 1 to 5.",
@@ -294,38 +294,39 @@ Numbers from 1 to 5:
 
     howItWorks: [
       "The mark is stored in the $mark variable.",
-      "The if-else statement checks whether the mark is at least 50.",
-      "The for loop starts at 1 and continues until 5.",
-      "Each loop iteration displays the current number.",
+      "The if-else statement checks whether the mark is 50 or above.",
+      "If the condition is true, PASS is displayed; otherwise FAIL is displayed.",
+      "The for loop displays numbers from 1 to 5.",
     ],
 
     examTips: [
       "Remember the if-else syntax.",
-      "Understand the three parts of a for loop.",
-      "Know how the loop variable changes.",
-      "Change the mark to test PASS and FAIL.",
+      "The condition $mark >= 50 checks the pass mark.",
+      "Know the three parts of a for loop.",
+      "The loop variable increases by 1 each time.",
     ],
   },
+
   {
-  id: 4,
-  number: "04",
-  title: "File Handling",
-  category: "PHP",
-  shortDescription:
-    "Open a file, write content into it, and close the file.",
+    id: 4,
+    number: "04",
+    title: "File Handling",
+    category: "PHP",
+    shortDescription:
+      "Create a file, write content, and close the file using PHP.",
 
-  aim:
-    "To demonstrate opening, writing, and closing a file using PHP.",
+    aim:
+      "To demonstrate creating a file, writing content into it, and closing the file using PHP.",
 
-  algorithm: [
-    "Open or create a file using fopen().",
-    "Write content into the file using fwrite().",
-    "Close the file using fclose().",
-    "Display a success message.",
-    "Stop the program.",
-  ],
+    algorithm: [
+      "Open or create a file using fopen().",
+      "Write content into the file using fwrite().",
+      "Close the file using fclose().",
+      "Display a success message.",
+      "Stop the program.",
+    ],
 
-  code: `<?php
+    code: `<?php
 
 $file = fopen("student.txt", "w");
 
@@ -337,41 +338,43 @@ echo "File created and written successfully.";
 
 ?>`,
 
-  output: `File created and written successfully.`,
+    output: `File created and written successfully.`,
 
-  howItWorks: [
-    "fopen() opens the file in write mode.",
-    "fwrite() writes the given text into the file.",
-    "fclose() closes the file after writing.",
-  ],
+    howItWorks: [
+      "fopen() opens or creates the file in write mode.",
+      "fwrite() writes the given text into the file.",
+      "fclose() closes the file after writing.",
+      "The success message confirms that the operation is completed.",
+    ],
 
-  examTips: [
-    "Remember fopen() is used to open a file.",
-    "Remember fwrite() is used to write content.",
-    "Remember fclose() is used to close the file.",
-    "The mode w is used for writing.",
-  ],
-},
-{
-  id: 5,
-  number: "05",
-  title: "Append to a File",
-  category: "PHP",
-  shortDescription:
-    "Add new content to an existing file without removing its old content.",
+    examTips: [
+      "Remember fopen() opens or creates a file.",
+      "Remember fwrite() writes content to a file.",
+      "Remember fclose() closes the file.",
+      "The mode w is used for writing.",
+    ],
+  },
 
-  aim:
-    "To demonstrate appending contents to an existing file using PHP.",
+  {
+    id: 5,
+    number: "05",
+    title: "Append to a File",
+    category: "PHP",
+    shortDescription:
+      "Add new content to an existing file without removing old content.",
 
-  algorithm: [
-    "Open the existing file using fopen() in append mode.",
-    "Add new content using fwrite().",
-    "Close the file using fclose().",
-    "Display a success message.",
-    "Stop the program.",
-  ],
+    aim:
+      "To demonstrate appending new content to an existing file using PHP.",
 
-  code: `<?php
+    algorithm: [
+      "Open the existing file using fopen() in append mode.",
+      "Add new content using fwrite().",
+      "Close the file using fclose().",
+      "Display a success message.",
+      "Stop the program.",
+    ],
+
+    code: `<?php
 
 $file = fopen("student.txt", "a");
 
@@ -383,41 +386,41 @@ echo "Content appended successfully.";
 
 ?>`,
 
-  output: `Content appended successfully.`,
+    output: `Content appended successfully.`,
 
-  howItWorks: [
-    "fopen() opens the existing file in append mode.",
-    "The mode a keeps the existing content and adds new content at the end.",
-    "fwrite() adds the new text.",
-    "fclose() closes the file after the operation.",
-  ],
+    howItWorks: [
+      "fopen() opens the file in append mode.",
+      "The mode a keeps the existing content and adds new content at the end.",
+      "fwrite() writes the new content into the file.",
+      "fclose() closes the file after the operation.",
+    ],
 
-  examTips: [
-    "Remember a means append mode.",
-    "Append mode keeps the existing content.",
-    "Use fwrite() to add new content.",
-    "Always close the file using fclose().",
-  ],
-},
-{
-  id: 6,
-  number: "06",
-  title: "Ascending Array Sort",
-  category: "PHP",
-  shortDescription:
-    "Sort array elements from the smallest value to the largest value.",
+    examTips: [
+      "Remember a means append mode.",
+      "Append mode keeps the existing content.",
+      "Use fwrite() to add new content.",
+      "Always close the file using fclose().",
+    ],
+  },
+  {
+    id: 6,
+    number: "06",
+    title: "Ascending Array Sort",
+    category: "PHP",
+    shortDescription:
+      "Sort array elements from the smallest value to the largest value.",
 
-  aim:
-    "To sort the elements of an array in ascending order using PHP.",
+    aim:
+      "To sort the elements of an array in ascending order using PHP.",
 
-  algorithm: [
-    "Declare an array containing numbers.",
-    "Use sort() to arrange the elements in ascending order.",
-    "Display the sorted array elements.",
-    "Stop the program.",
-  ],
+    algorithm: [
+      "Declare an array containing numbers.",
+      "Sort the array using sort().",
+      "Display the sorted elements using foreach.",
+      "Stop the program.",
+    ],
 
-  code: `<?php
+    code: `<?php
 
 $numbers = array(50, 20, 40, 10, 30);
 
@@ -431,42 +434,43 @@ foreach ($numbers as $number) {
 
 ?>`,
 
-  output: `Array elements in ascending order:
+    output: `Array elements in ascending order:
 10 20 30 40 50`,
 
-  howItWorks: [
-    "The array contains five numbers in an unsorted order.",
-    "sort() arranges the array elements from smallest to largest.",
-    "foreach is used to display each element of the sorted array.",
-  ],
+    howItWorks: [
+      "The array contains five numbers in an unsorted order.",
+      "sort() arranges the numbers from smallest to largest.",
+      "foreach displays each element of the sorted array.",
+    ],
 
-  examTips: [
-    "Remember sort() is used for ascending order.",
-    "sort() changes the original array.",
-    "Use foreach to display array elements one by one.",
-  ],
-},
-{
-  id: 7,
-  number: "07",
-  title: "Merge Two Arrays",
-  category: "PHP",
-  shortDescription:
-    "Combine two arrays and store their elements in a new array.",
+    examTips: [
+      "Remember sort() is used for ascending order.",
+      "sort() changes the original array.",
+      "Use foreach to display array elements one by one.",
+    ],
+  },
 
-  aim:
-    "To merge two arrays into a new array using PHP.",
+  {
+    id: 7,
+    number: "07",
+    title: "Merge Two Arrays",
+    category: "PHP",
+    shortDescription:
+      "Combine two arrays into a single array using PHP.",
 
-  algorithm: [
-    "Declare the first array.",
-    "Declare the second array.",
-    "Use array_merge() to combine both arrays.",
-    "Store the result in a new array.",
-    "Display the elements of the new array.",
-    "Stop the program.",
-  ],
+    aim:
+      "To merge two arrays into a single array using PHP.",
 
-  code: `<?php
+    algorithm: [
+      "Declare the first array.",
+      "Declare the second array.",
+      "Merge both arrays using array_merge().",
+      "Store the result in a new array.",
+      "Display the elements of the merged array.",
+      "Stop the program.",
+    ],
+
+    code: `<?php
 
 $array1 = array("Apple", "Banana", "Mango");
 $array2 = array("Orange", "Grapes", "Pineapple");
@@ -481,7 +485,7 @@ foreach ($newArray as $item) {
 
 ?>`,
 
-  output: `Merged Array:
+    output: `Merged Array:
 Apple
 Banana
 Mango
@@ -489,40 +493,41 @@ Orange
 Grapes
 Pineapple`,
 
-  howItWorks: [
-    "Two separate arrays are created.",
-    "array_merge() combines the elements of both arrays.",
-    "The merged result is stored in $newArray.",
-    "foreach displays each element of the new array.",
-  ],
+    howItWorks: [
+      "Two separate arrays are created.",
+      "array_merge() combines the elements of both arrays.",
+      "The merged array is stored in $newArray.",
+      "foreach displays the elements one by one.",
+    ],
 
-  examTips: [
-    "Remember array_merge() is used to combine arrays.",
-    "The result can be stored in a new array.",
-    "The elements of the first array appear before the second array.",
-  ],
-},
-{
-  id: 8,
-  number: "08",
-  title: "Customer Table",
-  category: "MYSQL",
-  shortDescription:
-    "Create a customer table and insert five customer records using MySQL.",
+    examTips: [
+      "Remember array_merge() is used to combine arrays.",
+      "The result can be stored in a new array.",
+      "The elements of the first array come before the second array.",
+    ],
+  },
 
-  aim:
-    "To create a customer table and insert five records into the table using MySQL.",
+  {
+    id: 8,
+    number: "08",
+    title: "Customer Table",
+    category: "MYSQL",
+    shortDescription:
+      "Create a customer table and insert five records using MySQL.",
 
-  algorithm: [
-    "Create a database named market_db.",
-    "Select the market_db database.",
-    "Create the customer table with required fields.",
-    "Insert five customer records into the table.",
-    "Display the records using SELECT.",
-    "Stop the program.",
-  ],
+    aim:
+      "To create a customer table and insert five customer records using MySQL.",
 
-  code: `CREATE DATABASE market_db;
+    algorithm: [
+      "Create a database named market_db.",
+      "Select the market_db database.",
+      "Create the customer table with required fields.",
+      "Insert five customer records.",
+      "Display the records using SELECT.",
+      "Stop the program.",
+    ],
+
+    code: `CREATE DATABASE market_db;
 
 USE market_db;
 
@@ -545,48 +550,47 @@ VALUES
 
 SELECT * FROM customer;`,
 
-  output: `customer_id | customer_name | email              | product      | quantity
+    output: `customer_id | customer_name | email              | product      | quantity
 1           | Arun          | arun@gmail.com     | Rice         | 5
 2           | Priya         | priya@gmail.com    | Milk         | 3
 3           | Karthik       | karthik@gmail.com  | Wheat        | 4
 4           | Meena         | meena@gmail.com    | Sugar        | 2
 5           | Vijay         | vijay@gmail.com    | Cooking Oil  | 3`,
 
-  howItWorks: [
-    "CREATE DATABASE creates the market_db database.",
-    "CREATE TABLE creates the customer table with five columns.",
-    "INSERT INTO adds five customer records.",
-    "SELECT * displays all records from the customer table.",
-  ],
+    howItWorks: [
+      "CREATE DATABASE creates the market_db database.",
+      "USE selects the database for the following operations.",
+      "CREATE TABLE creates the customer table.",
+      "INSERT INTO adds five customer records.",
+      "SELECT * displays all records from the table.",
+    ],
 
-  examTips: [
-    "Remember CREATE TABLE is used to create a table.",
-    "PRIMARY KEY uniquely identifies each customer.",
-    "AUTO_INCREMENT automatically generates the customer ID.",
-    "INSERT INTO is used to add records.",
-    "SELECT * displays all columns and records.",
-  ],
-},
+    examTips: [
+      "Remember CREATE DATABASE creates a database.",
+      "Remember CREATE TABLE creates a table.",
+      "PRIMARY KEY uniquely identifies each record.",
+      "AUTO_INCREMENT generates the customer ID automatically.",
+      "INSERT INTO is used to add records.",
+      "SELECT * displays all columns and records.",
+    ],
+  },
+
 {
   id: 9,
   number: "09",
   title: "MySQL String Functions",
   category: "MYSQL",
   shortDescription:
-    "Demonstrate commonly used string functions in MySQL with student data.",
+    "Demonstrate commonly used string functions in MySQL.",
 
   aim:
-    "To implement various string functions in MySQL.",
+    "To demonstrate commonly used string functions in MySQL.",
 
   algorithm: [
-    "Create a student table and insert sample records.",
-    "Use UPPER() and LOWER() to change letter case.",
-    "Use LENGTH() and CHAR_LENGTH() to find string length.",
-    "Use CONCAT() and CONCAT_WS() to combine strings.",
-    "Use LEFT(), RIGHT(), and SUBSTRING() to extract characters.",
-    "Use REPLACE() and TRIM() to modify strings.",
-    "Use REVERSE(), LOCATE(), and LPAD() for string operations.",
-    "Display the results.",
+    "Create a student table.",
+    "Insert a sample student record.",
+    "Apply different MySQL string functions to the student's name and course.",
+    "Display the results of each string function.",
     "Stop the program.",
   ],
 
@@ -601,9 +605,7 @@ CREATE TABLE student (
 );
 
 INSERT INTO student VALUES
-(1, 'Arun Kumar', 'Computer Science'),
-(2, 'Priya Devi', 'Information Technology'),
-(3, 'Karthik Rajan', 'Computer Applications');
+(1, 'Arun Kumar', 'Computer Science');
 
 SELECT UPPER(name) AS upper_name
 FROM student;
@@ -632,19 +634,16 @@ FROM student;
 SELECT SUBSTRING(name, 1, 5) AS part_of_name
 FROM student;
 
-SELECT REPLACE(course, 'Computer', 'C')
-AS changed_course
+SELECT REPLACE(course, 'Computer', 'C') AS changed_course
 FROM student;
 
-SELECT TRIM('   PHP MYSQL   ')
-AS trimmed_text;
+SELECT TRIM('   PHP MYSQL   ') AS trimmed_text;
 
 SELECT REVERSE(name) AS reversed_name
 FROM student;
 
 SELECT LOCATE('Kumar', name) AS position
-FROM student
-WHERE id = 1;
+FROM student;
 
 SELECT LPAD(name, 15, '*') AS padded_name
 FROM student;`,
@@ -667,14 +666,11 @@ LPAD: *****Arun Kumar`,
   howItWorks: [
     "UPPER() converts text to uppercase.",
     "LOWER() converts text to lowercase.",
-    "LENGTH() returns the length of a string in bytes.",
+    "LENGTH() returns the string length in bytes.",
     "CHAR_LENGTH() returns the number of characters.",
-    "CONCAT() joins multiple strings together.",
-    "CONCAT_WS() joins strings using a separator.",
-    "LEFT() returns characters from the beginning of a string.",
-    "RIGHT() returns characters from the end of a string.",
-    "SUBSTRING() extracts a portion of a string.",
-    "REPLACE() replaces matching text with new text.",
+    "CONCAT() and CONCAT_WS() combine strings.",
+    "LEFT(), RIGHT(), and SUBSTRING() extract parts of a string.",
+    "REPLACE() replaces matching text.",
     "TRIM() removes leading and trailing spaces.",
     "REVERSE() reverses a string.",
     "LOCATE() finds the position of a substring.",
@@ -682,40 +678,41 @@ LPAD: *****Arun Kumar`,
   ],
 
   examTips: [
-    "Remember UPPER() and LOWER() are used for changing case.",
-    "LENGTH() and CHAR_LENGTH() are used to find string length.",
+    "UPPER() and LOWER() change the letter case.",
+    "LENGTH() and CHAR_LENGTH() find string length.",
     "CONCAT() is used to join strings.",
-    "LEFT(), RIGHT(), and SUBSTRING() extract parts of a string.",
+    "LEFT(), RIGHT(), and SUBSTRING() extract text.",
     "REPLACE() changes matching text.",
-    "TRIM() removes extra spaces at the beginning and end.",
-    "REVERSE() reverses the string.",
-    "LOCATE() returns the position of a substring.",
-    "LPAD() adds characters to the left side.",
+    "TRIM() removes leading and trailing spaces.",
+    "REVERSE() reverses a string.",
+    "LOCATE() finds the position of text.",
+    "LPAD() adds characters to the left.",
   ],
 },
-{
-  id: 10,
-  number: "10",
-  title: "User-Defined Functions",
-  category: "PHP",
-  shortDescription:
-    "Create and use user-defined functions with parameters and return values.",
 
-  aim:
-    "To implement the concept of user-defined functions using PHP.",
+  {
+    id: 10,
+    number: "10",
+    title: "User-Defined Functions",
+    category: "PHP",
+    shortDescription:
+      "Create functions with parameters and return values in PHP.",
 
-  algorithm: [
-    "Define a function to calculate the total of three marks.",
-    "Pass three marks as parameters to the function.",
-    "Return the calculated total.",
-    "Define another function to calculate the average.",
-    "Pass the total as a parameter.",
-    "Return the calculated average.",
-    "Display the total and average.",
-    "Stop the program.",
-  ],
+    aim:
+      "To demonstrate user-defined functions with parameters and return values in PHP.",
 
-  code: `<?php
+    algorithm: [
+      "Define a function to calculate the total of three marks.",
+      "Pass three marks as parameters.",
+      "Return the calculated total.",
+      "Define a function to calculate the average.",
+      "Pass the total to the function.",
+      "Return the calculated average.",
+      "Display the total and average.",
+      "Stop the program.",
+    ],
+
+    code: `<?php
 
 function calculateTotal($mark1, $mark2, $mark3)
 {
@@ -743,53 +740,52 @@ echo "Average: $average<br>";
 
 ?>`,
 
-  output: `Student Marks
+    output: `Student Marks
 Mark 1: 75
 Mark 2: 80
 Mark 3: 70
 Total: 225
 Average: 75`,
 
-  howItWorks: [
-    "calculateTotal() is a user-defined function with three parameters.",
-    "It adds the three marks and returns the total.",
-    "calculateAverage() receives the total as a parameter.",
-    "It calculates and returns the average.",
-    "The returned values are stored in variables and displayed.",
-  ],
+    howItWorks: [
+      "calculateTotal() accepts three marks and returns their total.",
+      "calculateAverage() accepts the total and returns the average.",
+      "The functions are called using the required arguments.",
+      "The returned values are stored and displayed.",
+    ],
 
-  examTips: [
-    "A user-defined function is created by using the function keyword.",
-    "Parameters are values passed to a function.",
-    "return is used to send a value back from the function.",
-    "A function is called using its function name followed by parentheses.",
-    "This program demonstrates parameterized functions with return values.",
-  ],
-},
-{
-  id: 11,
-  number: "11",
-  title: "Update, Alter & Delete",
-  category: "MYSQL",
-  shortDescription:
-    "Update records, alter the customer table, and delete a record using MySQL.",
+    examTips: [
+      "Use the function keyword to define a function.",
+      "Parameters receive values passed to a function.",
+      "return sends a value back from the function.",
+      "Call a function using its name followed by parentheses.",
+    ],
+  },
 
-  aim:
-    "To perform update, alter, and delete operations on records stored in the customer table.",
+  {
+    id: 11,
+    number: "11",
+    title: "Update, Alter & Delete",
+    category: "MYSQL",
+    shortDescription:
+      "Perform UPDATE, ALTER, and DELETE operations using MySQL.",
 
-  algorithm: [
-    "Create the market_operations_db database.",
-    "Select the database.",
-    "Create the customer table and insert five records.",
-    "Update an existing customer record.",
-    "Alter the table by adding a new column.",
-    "Update values in the new column.",
-    "Delete a customer record.",
-    "Display the final records.",
-    "Stop the program.",
-  ],
+    aim:
+      "To demonstrate UPDATE, ALTER TABLE, and DELETE operations on a MySQL table.",
 
-  code: `CREATE DATABASE market_operations_db;
+    algorithm: [
+      "Create the market_operations_db database.",
+      "Select the database.",
+      "Create the customer table and insert five records.",
+      "Update an existing customer record.",
+      "Add a price column using ALTER TABLE.",
+      "Update the price values.",
+      "Delete one customer record.",
+      "Display the final records.",
+      "Stop the program.",
+    ],
+
+    code: `CREATE DATABASE market_operations_db;
 
 USE market_operations_db;
 
@@ -806,8 +802,6 @@ INSERT INTO customer VALUES
 (3, 'Karthik', 'Wheat', 4),
 (4, 'Meena', 'Sugar', 2),
 (5, 'Vijay', 'Oil', 3);
-
-SELECT * FROM customer;
 
 UPDATE customer
 SET product = 'Basmati Rice'
@@ -841,47 +835,49 @@ WHERE customer_id = 5;
 
 SELECT * FROM customer;`,
 
-  output: `customer_id | customer_name | product       | quantity | price
+    output: `customer_id | customer_name | product       | quantity | price
 1           | Arun          | Basmati Rice  | 5        | 500
 2           | Priya         | Milk          | 3        | 150
 3           | Karthik       | Wheat         | 4        | 300
 4           | Meena         | Sugar         | 2        | 100`,
 
-  howItWorks: [
-    "UPDATE changes existing data in a record.",
-    "ALTER TABLE changes the structure of the table by adding the price column.",
-    "The price column is then given values for the records.",
-    "DELETE removes the customer whose customer_id is 5.",
-    "The final SELECT displays the remaining records.",
-  ],
+    howItWorks: [
+      "UPDATE changes existing data in a record.",
+      "ALTER TABLE adds the price column to the table.",
+      "UPDATE assigns price values to the customers.",
+      "DELETE removes the customer with customer_id 5.",
+      "SELECT * displays the final records.",
+    ],
 
-  examTips: [
-    "UPDATE is used to modify existing records.",
-    "Always use a WHERE condition with UPDATE when changing a specific record.",
-    "ALTER TABLE is used to change the structure of a table.",
-    "ADD is used with ALTER TABLE to add a new column.",
-    "DELETE is used to remove records.",
-    "Always use WHERE with DELETE when removing a specific record.",
-  ],
-},
+    examTips: [
+      "UPDATE is used to modify existing records.",
+      "Use WHERE when updating a specific record.",
+      "ALTER TABLE changes the table structure.",
+      "ADD is used to add a new column.",
+      "DELETE removes records.",
+      "Use WHERE with DELETE when removing a specific record.",
+    ],
+  },
+
 {
   id: 12,
   number: "12",
   title: "Retrieve MySQL Data",
   category: "PHP",
   shortDescription:
-    "Connect PHP with MySQL and retrieve records from a database.",
+    "Connect PHP with MySQL and retrieve student records.",
 
   aim:
-    "To retrieve and display data from a MySQL database using PHP.",
+    "To connect PHP with MySQL and retrieve and display student records from a database.",
 
   algorithm: [
     "Connect PHP to the MySQL database.",
     "Check whether the database connection is successful.",
-    "Execute a SELECT query to retrieve records.",
+    "Write a SELECT query to retrieve student records.",
+    "Execute the query using mysqli_query().",
     "Check whether the query is successful.",
-    "Fetch the records using mysqli_fetch_assoc().",
-    "Display the retrieved records.",
+    "Fetch each record using mysqli_fetch_assoc().",
+    "Display the student details.",
     "Close the database connection.",
     "Stop the program.",
   ],
@@ -937,11 +933,11 @@ Phone: 9876543211
 --------------------------`,
 
   howItWorks: [
-    "mysqli_connect() establishes a connection between PHP and MySQL.",
+    "mysqli_connect() connects PHP to the student_system database.",
     "The SELECT query retrieves records from the students table.",
     "mysqli_query() executes the SQL query.",
-    "mysqli_fetch_assoc() fetches each record as an associative array.",
-    "The retrieved values are displayed using echo.",
+    "mysqli_fetch_assoc() fetches one record at a time.",
+    "The column values are displayed using echo.",
     "mysqli_close() closes the database connection.",
   ],
 
@@ -950,10 +946,14 @@ Phone: 9876543211
     "SELECT is used to retrieve records.",
     "mysqli_query() executes the SQL query.",
     "mysqli_fetch_assoc() fetches records one by one.",
-    "Use mysqli_close() to close the connection.",
+    "while is used to display multiple records.",
+    "mysqli_close() closes the database connection.",
+    "Remember: Connect → Query → Fetch → Display → Close.",
   ],
 },
 
+ 
 ];
+ 
 
 export default programs;

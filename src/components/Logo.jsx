@@ -2,13 +2,16 @@ import React from "react";
 
 function Logo({ compact = false, className = "" }) {
   return (
-    <div className={`app-logo ${className}`}>
-      <div className="app-logo__icon">
-        <span>&lt;&gt;</span>
+    <div className={`app-logo ${compact ? "app-logo--compact" : ""} ${className}`}>
+      <div className="app-logo__icon" aria-hidden="true">
+        <span>&lt;/&gt;</span>
       </div>
-      <span className="app-logo__text">
-        Dev<strong>Lab</strong>
-      </span>
+      
+      {!compact && (
+        <span className="app-logo__text">
+          CS<strong>Lab</strong>
+        </span>
+      )}
 
       <style>{`
         .app-logo {
@@ -24,24 +27,31 @@ function Logo({ compact = false, className = "" }) {
           place-items: center;
           width: 32px;
           height: 32px;
-          border-radius: 4px;
-          background: #6366f1;
+          border-radius: 6px;
+          background: var(--accent-blue, #0284c7);
           color: #ffffff;
           font-family: ui-monospace, SFMono-Regular, monospace;
           font-size: 13px;
           font-weight: 800;
+          flex-shrink: 0;
         }
 
         .app-logo__text {
           font-size: 16px;
           font-weight: 600;
           letter-spacing: -0.02em;
-          color: var(--text, #f0f4f8);
+          color: var(--text, #f1f5f9);
         }
 
         .app-logo__text strong {
-          color: #6366f1;
+          color: var(--accent-blue, #0284c7);
           font-weight: 800;
+        }
+
+        .app-logo--compact .app-logo__icon {
+          width: 28px;
+          height: 28px;
+          font-size: 11px;
         }
       `}</style>
     </div>

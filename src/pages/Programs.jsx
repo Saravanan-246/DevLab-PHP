@@ -1,14 +1,11 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import ProgramCard from "../components/ProgramCard";
 import SectionHeading from "../components/SectionHeading";
-import Logo from "../components/Logo";
-import ThemeToggle from "../components/ThemeToggle";
 
 function Programs({
   programs = [],
   initialCategory = "PHP",
   theme = "dark",
-  onToggleTheme,
   onOpenProgram,
   onClose,
   className = "",
@@ -19,6 +16,8 @@ function Programs({
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef(null);
 
+  const isLight = theme === "light";
+
   useEffect(() => {
     if (initialCategory === "ANDROID" || initialCategory === "PHP") {
       setSelectedCategory(initialCategory);
@@ -28,7 +27,10 @@ function Programs({
   // Keyboard shortcut listener ('/' or 'Cmd+K' to focus search)
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.key === "/" || (e.metaKey && e.key === "k")) && document.activeElement !== searchInputRef.current) {
+      if (
+        (e.key === "/" || (e.metaKey && e.key === "k")) &&
+        document.activeElement !== searchInputRef.current
+      ) {
         e.preventDefault();
         searchInputRef.current?.focus();
       }
@@ -72,40 +74,46 @@ function Programs({
   }, [programs, selectedCategory, searchQuery]);
 
   return (
-    <div className={`programs-page ${className}`}>
-      {/* Header Bar with Glassmorphism */}
-      <header className="programs-page__header">
-        <div className="programs-page__header-inner">
-          <div className="programs-page__brand">
-            <Logo compact />
-            <span className="programs-page__divider" />
-            <span className="programs-page__context">Practical Hub</span>
-          </div>
-
-          <div className="programs-page__actions">
-            <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-            <button
-              type="button"
-              className="programs-page__close-btn"
-              onClick={onClose}
-            >
-              <span>Close</span>
-              <kbd className="programs-page__kbd">Esc</kbd>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
+    <div
+      className={`programs-page ${
+        isLight ? "programs-page--light" : "programs-page--dark"
+      } ${className}`}
+    >
       <main className="programs-page__main">
         <div className="programs-page__container">
+          {/* Top Bar with Back Button */}
+          <div className="programs-page__nav-bar">
+            {onClose && (
+              <button
+                type="button"
+                className="programs-page__back-btn"
+                onClick={onClose}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+                <span>Back to Home</span>
+              </button>
+            )}
+          </div>
+
           <SectionHeading
-            badge="Practical Directory"
+            badge="Practical Reference"
             title="Lab Practicals"
-            description="Select a course to view source code, algorithm steps, and output."
+            description="Select a module to view algorithms, source code, and expected outputs."
           />
 
-          {/* Controls: Styled Category Tabs + Enhanced Search Bar */}
+          {/* Controls: Category Tabs & Search Bar */}
           <div className="programs-page__toolbar">
             <div className="programs-page__categories">
               {categories.map((cat) => {
@@ -122,7 +130,9 @@ function Programs({
                   >
                     <span className="programs-page__category-dot" />
                     <span>{cat === "PHP" ? "PHP & MySQL" : "Android"}</span>
-                    <span className="programs-page__category-badge">{count}</span>
+                    <span className="programs-page__category-badge">
+                      {count}
+                    </span>
                   </button>
                 );
               })}
@@ -147,7 +157,7 @@ function Programs({
                 ref={searchInputRef}
                 type="text"
                 className="programs-page__search-input"
-                placeholder="Search practicals... (/)"
+                placeholder="Search modules... (/)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -166,30 +176,44 @@ function Programs({
             </div>
           </div>
 
-          {/* Grid Header Counter */}
+          {/* Practical Item Counter Bar */}
           <div className="programs-page__meta-bar">
             <span className="programs-page__meta-count">
-              Showing <strong>{filteredPrograms.length}</strong> {selectedCategory === "PHP" ? "PHP & MySQL" : "Android"} practical{filteredPrograms.length !== 1 ? "s" : ""}
+              Showing <strong>{filteredPrograms.length}</strong>{" "}
+              {selectedCategory === "PHP" ? "PHP & MySQL" : "Android"} module
+              {filteredPrograms.length !== 1 ? "s" : ""}
             </span>
           </div>
 
-          {/* Grid View */}
+          {/* Practical Cards Grid */}
           {filteredPrograms.length > 0 ? (
             <div className="programs-page__grid">
               {filteredPrograms.map((program) => (
                 <ProgramCard
                   key={program.id}
                   program={program}
+                  theme={theme}
                   onOpen={onOpenProgram}
                 />
               ))}
             </div>
           ) : (
             <div className="programs-page__empty">
-              <div className="programs-page__empty-icon">🔍</div>
-              <h3>No practicals found</h3>
+              <svg
+                className="programs-page__empty-icon"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <h3>No Modules Match Your Search</h3>
               <p>
-                No practical matches "<strong>{searchQuery}</strong>" in{" "}
+                No practical found matching "<strong>{searchQuery}</strong>" in{" "}
                 {selectedCategory === "PHP" ? "PHP & MySQL" : "Android"}.
               </p>
               <button
@@ -205,108 +229,96 @@ function Programs({
       </main>
 
       <style>{`
+        /* --- Color Tokens & Theme Logic --- */
+        .programs-page--dark {
+          --p-bg: var(--bg, #090d12);
+          --p-panel: var(--surface, #111720);
+          --p-panel-hover: var(--surface-soft, #1a2332);
+          --p-text: var(--text, #f1f5f9);
+          --p-muted: var(--muted, #94a3b8);
+          --p-border: var(--border, #1e293b);
+          --p-border-strong: var(--border-strong, #334155);
+          --p-badge-bg: rgba(255, 255, 255, 0.06);
+          --p-accent-php: #0284c7;
+          --p-accent-php-bg: rgba(2, 132, 199, 0.12);
+          --p-accent-php-text: #f0f9ff;
+          --p-accent-android: #059669;
+          --p-accent-android-bg: rgba(5, 150, 105, 0.12);
+          --p-accent-android-text: #ecfdf5;
+        }
+
+        .programs-page--light {
+          --p-bg: var(--bg, #f8fafc);
+          --p-panel: var(--surface, #ffffff);
+          --p-panel-hover: var(--surface-soft, #f1f5f9);
+          --p-text: var(--text, #0f172a);
+          --p-muted: var(--muted, #64748b);
+          --p-border: var(--border, #e2e8f0);
+          --p-border-strong: var(--border-strong, #cbd5e1);
+          --p-badge-bg: rgba(0, 0, 0, 0.05);
+          --p-accent-php: #0284c7;
+          --p-accent-php-bg: rgba(2, 132, 199, 0.1);
+          --p-accent-php-text: #0369a1;
+          --p-accent-android: #10b981;
+          --p-accent-android-bg: rgba(16, 185, 129, 0.1);
+          --p-accent-android-text: #047857;
+        }
+
         .programs-page {
           min-height: 100vh;
           width: 100%;
-          overflow-x: hidden;
-          background: var(--bg, #090b0e);
-          color: var(--text, #f0f4f8);
-          font-family: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+          background-color: var(--p-bg);
+          color: var(--p-text);
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        .programs-page__header {
-          position: sticky;
-          top: 0;
-          z-index: 50;
-          width: 100%;
-          border-bottom: 1px solid var(--border, #1a202c);
-          background: rgba(9, 11, 14, 0.82);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
+        .programs-page__main {
+          padding: 1.5rem 0 4rem;
         }
 
-        .programs-page__header-inner {
-          width: min(1180px, calc(100% - 32px));
-          height: 60px;
+        .programs-page__container {
+          max-width: 1180px;
           margin: 0 auto;
+          padding: 0 1.25rem;
+        }
+
+        /* Top Navigation Header & Back Button */
+        .programs-page__nav-bar {
+          margin-bottom: 1rem;
           display: flex;
           align-items: center;
-          justify-content: space-between;
         }
 
-        .programs-page__brand {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .programs-page__divider {
-          width: 1px;
-          height: 16px;
-          background: var(--border, #1a202c);
-        }
-
-        .programs-page__context {
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 11px;
-          color: var(--muted, #8a96a8);
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-        }
-
-        .programs-page__actions {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        .programs-page__close-btn {
+        .programs-page__back-btn {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          height: 34px;
-          padding: 0 12px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 4px;
-          background: var(--surface, #11151c);
-          color: var(--text, #f0f4f8);
-          font-size: 11px;
+          padding: 6px 12px;
+          border: 1px solid var(--p-border);
+          border-radius: 6px;
+          background: var(--p-panel);
+          color: var(--p-muted);
+          font-size: 13px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.15s ease;
         }
 
-        .programs-page__close-btn:hover {
-          border-color: var(--accent, #3b82f6);
-          background: var(--surface-soft, #171d26);
+        .programs-page__back-btn:hover {
+          color: var(--p-text);
+          border-color: var(--p-border-strong);
+          background: var(--p-panel-hover);
         }
 
-        .programs-page__kbd {
-          padding: 2px 4px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 3px;
-          background: rgba(255, 255, 255, 0.04);
-          font-family: ui-monospace, SFMono-Regular, monospace;
-          font-size: 9px;
-          color: var(--muted, #8a96a8);
-        }
-
-        .programs-page__main {
-          padding: 32px 0 80px;
-        }
-
-        .programs-page__container {
-          width: min(1180px, calc(100% - 32px));
-          margin: 0 auto;
-        }
-
-        /* Toolbar Filter & Search */
+        /* Controls & Filter Bar */
         .programs-page__toolbar {
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 16px;
-          margin-bottom: 16px;
+          margin-top: 1.5rem;
+          margin-bottom: 1.25rem;
         }
 
         .programs-page__categories {
@@ -320,73 +332,59 @@ function Programs({
           align-items: center;
           gap: 8px;
           padding: 8px 14px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 4px;
-          background: var(--surface, #11151c);
-          color: var(--muted, #8a96a8);
+          border: 1px solid var(--p-border);
+          border-radius: 6px;
+          background: var(--p-panel);
+          color: var(--p-muted);
           font-size: 12px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.15s ease;
         }
 
+        .programs-page__category-btn:hover {
+          color: var(--p-text);
+          border-color: var(--p-border-strong);
+        }
+
         .programs-page__category-dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: var(--muted, #64748b);
-          transition: background-color 0.15s ease, box-shadow 0.15s ease;
+          background: var(--p-muted);
+          transition: transform 0.15s ease, background-color 0.15s ease;
         }
 
         .programs-page__category-badge {
           padding: 1px 6px;
           border-radius: 10px;
-          background: rgba(255, 255, 255, 0.06);
+          background: var(--p-badge-bg);
           font-family: ui-monospace, SFMono-Regular, monospace;
           font-size: 10px;
-          color: var(--muted, #8a96a8);
-          transition: all 0.15s ease;
+          color: var(--p-muted);
         }
 
-        /* PHP & MySQL Button Styling (Indigo Theme) */
-        .programs-page__category-btn--php:hover {
-          border-color: rgba(99, 102, 241, 0.4);
-          color: #f0f4f8;
-        }
         .programs-page__category-btn--php.programs-page__category-btn--active {
-          border-color: #6366f1;
-          background: rgba(99, 102, 241, 0.12);
-          color: #a5b4fc;
+          border-color: var(--p-accent-php);
+          color: var(--p-accent-php-text);
+          background: var(--p-accent-php-bg);
         }
+
         .programs-page__category-btn--php.programs-page__category-btn--active .programs-page__category-dot {
-          background: #6366f1;
-          box-shadow: 0 0 8px rgba(99, 102, 241, 0.8);
-        }
-        .programs-page__category-btn--php.programs-page__category-btn--active .programs-page__category-badge {
-          background: rgba(99, 102, 241, 0.25);
-          color: #c7d2fe;
+          background: var(--p-accent-php);
         }
 
-        /* Android Button Styling (Emerald Theme) */
-        .programs-page__category-btn--android:hover {
-          border-color: rgba(16, 185, 129, 0.4);
-          color: #f0f4f8;
-        }
         .programs-page__category-btn--android.programs-page__category-btn--active {
-          border-color: #10b981;
-          background: rgba(16, 185, 129, 0.12);
-          color: #6ee7b7;
-        }
-        .programs-page__category-btn--android.programs-page__category-btn--active .programs-page__category-dot {
-          background: #10b981;
-          box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
-        }
-        .programs-page__category-btn--android.programs-page__category-btn--active .programs-page__category-badge {
-          background: rgba(16, 185, 129, 0.25);
-          color: #a7f3d0;
+          border-color: var(--p-accent-android);
+          color: var(--p-accent-android-text);
+          background: var(--p-accent-android-bg);
         }
 
-        /* Search Input */
+        .programs-page__category-btn--android.programs-page__category-btn--active .programs-page__category-dot {
+          background: var(--p-accent-android);
+        }
+
+        /* Search Box */
         .programs-page__search-box {
           position: relative;
           display: flex;
@@ -397,31 +395,25 @@ function Programs({
         .programs-page__search-icon {
           position: absolute;
           left: 12px;
-          color: var(--muted, #8a96a8);
+          color: var(--p-muted);
           pointer-events: none;
-          transition: color 0.15s ease;
         }
 
         .programs-page__search-input {
           width: 100%;
           height: 38px;
           padding: 0 32px 0 36px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 4px;
-          background: var(--surface, #11151c);
-          color: var(--text, #f0f4f8);
+          border: 1px solid var(--p-border);
+          border-radius: 6px;
+          background: var(--p-panel);
+          color: var(--p-text);
           font-size: 12px;
           outline: none;
-          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+          transition: border-color 0.15s ease, background-color 0.15s ease;
         }
 
         .programs-page__search-input:focus {
-          border-color: var(--accent, #3b82f6);
-          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
-        }
-
-        .programs-page__search-input:focus + .programs-page__search-icon {
-          color: var(--accent, #3b82f6);
+          border-color: var(--p-border-strong);
         }
 
         .programs-page__clear-btn {
@@ -429,86 +421,79 @@ function Programs({
           right: 10px;
           border: none;
           background: transparent;
-          color: var(--muted, #8a96a8);
+          color: var(--p-muted);
           font-size: 12px;
           cursor: pointer;
-          padding: 2px 4px;
-          transition: color 0.15s ease;
-        }
-
-        .programs-page__clear-btn:hover {
-          color: var(--text, #f0f4f8);
         }
 
         .programs-page__search-kbd {
           position: absolute;
           right: 10px;
           padding: 2px 6px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 3px;
-          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid var(--p-border);
+          border-radius: 4px;
+          background: var(--p-badge-bg);
           font-family: ui-monospace, SFMono-Regular, monospace;
           font-size: 10px;
-          color: var(--muted, #8a96a8);
+          color: var(--p-muted);
           pointer-events: none;
         }
 
-        /* Meta Counter Bar */
+        /* Meta Item Counter Bar */
         .programs-page__meta-bar {
-          margin-bottom: 20px;
-          padding-bottom: 12px;
-          border-bottom: 1px solid var(--border, #1a202c);
+          margin-bottom: 1.25rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid var(--p-border);
         }
 
         .programs-page__meta-count {
           font-size: 12px;
-          color: var(--muted, #8a96a8);
+          color: var(--p-muted);
         }
 
         .programs-page__meta-count strong {
-          color: var(--text, #f0f4f8);
+          color: var(--p-text);
         }
 
         /* Grid Layout */
         .programs-page__grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
           gap: 16px;
         }
 
         /* Empty State */
         .programs-page__empty {
           text-align: center;
-          padding: 64px 20px;
-          border: 1px dashed var(--border-strong, #2d3748);
-          border-radius: 4px;
-          background: var(--surface, #11151c);
+          padding: 4rem 1.5rem;
+          border: 1px solid var(--p-border);
+          border-radius: 8px;
+          background: var(--p-panel);
         }
 
         .programs-page__empty-icon {
-          font-size: 28px;
-          margin-bottom: 12px;
-          opacity: 0.8;
+          color: var(--p-muted);
+          margin-bottom: 1rem;
         }
 
         .programs-page__empty h3 {
-          margin: 0 0 6px 0;
-          font-size: 16px;
+          margin: 0 0 0.5rem;
+          font-size: 1.1rem;
           font-weight: 700;
         }
 
         .programs-page__empty p {
-          margin: 0 0 20px 0;
-          font-size: 13px;
-          color: var(--muted, #8a96a8);
+          margin: 0 0 1.5rem;
+          font-size: 0.875rem;
+          color: var(--p-muted);
         }
 
         .programs-page__reset-btn {
           padding: 8px 16px;
-          border: 1px solid var(--border-strong, #2d3748);
-          border-radius: 4px;
-          background: var(--surface-soft, #171d26);
-          color: var(--accent, #3b82f6);
+          border: 1px solid var(--p-border-strong);
+          border-radius: 6px;
+          background: var(--p-panel-hover);
+          color: var(--p-text);
           font-size: 12px;
           font-weight: 600;
           cursor: pointer;
@@ -516,31 +501,11 @@ function Programs({
         }
 
         .programs-page__reset-btn:hover {
-          border-color: var(--accent, #3b82f6);
-          background: rgba(59, 130, 246, 0.1);
+          border-color: var(--p-muted);
         }
 
-        /* Mobile Responsive Layout */
+        /* Responsive Breakpoints */
         @media (max-width: 640px) {
-          .programs-page__header-inner {
-            width: calc(100% - 24px);
-            height: 54px;
-          }
-
-          .programs-page__context,
-          .programs-page__divider,
-          .programs-page__kbd {
-            display: none;
-          }
-
-          .programs-page__main {
-            padding: 20px 0 60px;
-          }
-
-          .programs-page__container {
-            width: calc(100% - 24px);
-          }
-
           .programs-page__toolbar {
             flex-direction: column;
             align-items: stretch;
@@ -562,7 +527,6 @@ function Programs({
 
           .programs-page__grid {
             grid-template-columns: 1fr;
-            gap: 12px;
           }
         }
       `}</style>

@@ -1,23 +1,24 @@
+// androidPrograms.js
+
 const androidPrograms = [
+  // --- PRACTICAL 01 ---
   {
     id: 13,
     number: "01",
     title: "GUI Components — Font & Color",
     category: "ANDROID",
-    shortDescription: "Change TextView font size and text color using button clicks.",
-    aim: "To develop an Android application that changes the font size and text colour of a TextView using buttons.",
+    shortDescription: "Dynamically adjust TextView text size and color cycling on button clicks.",
+    aim: "To develop an Android application that alters the font size and color of a TextView dynamically using action buttons.",
     algorithm: [
-      "Start the application and load the main activity layout.",
-      "Create a TextView and two Buttons for changing font size and color.",
-      "Initialize the TextView with default font size and color.",
-      "Define arrays for selectable font sizes and color values.",
-      "Attach a click listener to the Change Font button to cycle font sizes.",
-      "Attach a click listener to the Change Color button to cycle text colors.",
-      "Display updated TextView properties on screen.",
-      "Stop the application."
+      "Initialize MainActivity and bind UI elements (TextView, Button for font, Button for color).",
+      "Define default text properties and state counters for tracking click interactions.",
+      "Declare arrays containing target font sizes (float) and Color constants.",
+      "Implement setOnClickListener on font button to cycle font sizes via modulo arithmetic.",
+      "Implement setOnClickListener on color button to cycle color values via modulo arithmetic.",
+      "Render updated text properties onto the screen dynamically upon each click."
     ],
     code: `// MainActivity.java
-package com.example.program;
+package com.example.lab01;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -28,14 +29,12 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
     private TextView textView;
     private Button buttonFont, buttonColor;
-    private int fontClickCount = 0;
-    private int colorClickCount = 0;
+    
+    private int fontIndex = 0;
+    private int colorIndex = 0;
 
-    private final float defaultFontSize = 24f;
-    private final int defaultColor = Color.BLACK;
-
-    private final int[] colors = { Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW };
-    private final float[] fontSizes = { 20f, 25f, 30f, 35f, 40f };
+    private final float[] fontSizes = { 20f, 24f, 28f, 32f, 36f };
+    private final int[] colors = { Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,19 +45,14 @@ public class MainActivity extends AppCompatActivity {
         buttonFont = findViewById(R.id.buttonFont);
         buttonColor = findViewById(R.id.buttonColor);
 
-        textView.setTextSize(defaultFontSize);
-        textView.setTextColor(defaultColor);
-
         buttonFont.setOnClickListener(v -> {
-            fontClickCount++;
-            int index = fontClickCount % fontSizes.length;
-            textView.setTextSize(fontSizes[index]);
+            fontIndex = (fontIndex + 1) % fontSizes.length;
+            textView.setTextSize(fontSizes[fontIndex]);
         });
 
         buttonColor.setOnClickListener(v -> {
-            colorClickCount++;
-            int index = colorClickCount % colors.length;
-            textView.setTextColor(colors[index]);
+            colorIndex = (colorIndex + 1) % colors.length;
+            textView.setTextColor(colors[colorIndex]);
         });
     }
 }
@@ -70,128 +64,118 @@ public class MainActivity extends AppCompatActivity {
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="24dp">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to NGP"
+        android:text="Welcome to Android Workspace"
         android:textColor="@android:color/black"
-        android:textSize="24sp"
-        android:layout_marginBottom="24dp" />
+        android:textSize="20sp"
+        android:layout_marginBottom="32dp" />
 
     <Button
         android:id="@+id/buttonFont"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Change Font"
-        android:layout_marginBottom="10dp" />
+        android:text="Change Font Size"
+        android:layout_marginBottom="12dp" />
 
     <Button
         android:id="@+id/buttonColor"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Change Colour" />
+        android:text="Change Color" />
 
 </LinearLayout>`,
-    output: `Welcome to NGP\n\n[Change Font]  [Change Colour]`,
+    output: `Welcome to Android Workspace\n\n[Change Font Size]\n[Change Color]`,
     howItWorks: [
-      "The TextView holds the default text 'Welcome to NGP'.",
-      "Clicking 'Change Font' increments a counter and applies the next font size using modulo arithmetic.",
-      "Clicking 'Change Colour' cycles through predefined Android Color values."
+      "TextView holds initialized baseline text elements inside the user layout.",
+      "Modulo calculation ((index + 1) % length) guarantees bounds safety while cycling array elements.",
+      "setTextSize() and setTextColor() trigger layout redraws with updated visual parameters instantly."
     ],
     examTips: [
-      "Remember that fontSizes array uses float values (e.g., 20f, 25f).",
-      "Use modulo (%) operator to avoid IndexOutOfBoundsException when cycling array items.",
-      "Ensure XML IDs in activity_main.xml match the IDs used in findViewById()."
+      "Use modulo % to prevent IndexOutOfBoundsException during cycling.",
+      "Ensure float values (e.g., 20f) are passed to setTextSize()."
     ]
   },
+
+  // --- PRACTICAL 02 ---
   {
     id: 14,
     number: "02",
     title: "Layout Manager — Student Form",
     category: "ANDROID",
-    shortDescription: "Accept student details using UI controls and display them.",
-    aim: "To develop an Android application using a layout manager to accept student details and display them.",
+    shortDescription: "Capture student details via form controls and display results on a secondary layout.",
+    aim: "To develop an Android application utilizing layout components and Spinner dropdowns to accept and present student details.",
     algorithm: [
-      "Start the application and load the student detail form.",
-      "Create input fields for student name and registration number.",
-      "Create a Spinner to allow selecting a department.",
-      "Populate department items in the Spinner using an ArrayAdapter.",
-      "Create a Submit button for processing user inputs.",
-      "When Submit is clicked, read name, reg number, and department.",
-      "Construct a dynamic layout to display collected student information.",
-      "Display the name, registration number, and department on screen.",
-      "Stop the application."
+      "Set up layout containing EditTexts for Name/RegNo, Spinner for Department, and a Submit button.",
+      "Initialize Spinner control using ArrayAdapter bound to an array of department names.",
+      "Read form input strings when Submit button click event is fired.",
+      "Instantiate a dynamic vertical LinearLayout containing formatted result TextViews.",
+      "Re-render view context with setContentView(detailLayout) to present recorded entries."
     ],
     code: `// MainActivity.java
-package com.example.pro2;
+package com.example.lab02;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.view.Gravity;
-import android.graphics.Typeface;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText editTextName, editTextRegNo;
+    private EditText editName, editRegNo;
     private Spinner spinnerDept;
-    private Button buttonSubmit;
+    private Button btnSubmit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editTextName = findViewById(R.id.editTextName);
-        editTextRegNo = findViewById(R.id.editTextRegNo);
+        editName = findViewById(R.id.editName);
+        editRegNo = findViewById(R.id.editRegNo);
         spinnerDept = findViewById(R.id.spinnerDept);
-        buttonSubmit = findViewById(R.id.buttonSubmit);
+        btnSubmit = findViewById(R.id.btnSubmit);
 
-        String[] departments = {"CS", "IT", "AIML"};
+        String[] departments = { "CS", "IT", "AIML", "ECE" };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, departments);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerDept.setAdapter(adapter);
 
-        buttonSubmit.setOnClickListener(view -> showDetailsScreen(
-            editTextName.getText().toString().trim(),
-            editTextRegNo.getText().toString().trim(),
-            spinnerDept.getSelectedItem().toString()
-        ));
+        btnSubmit.setOnClickListener(v -> renderResultView());
     }
 
-    private void showDetailsScreen(String name, String regNo, String dept) {
-        LinearLayout detailLayout = new LinearLayout(this);
-        detailLayout.setOrientation(LinearLayout.VERTICAL);
-        detailLayout.setPadding(50, 100, 50, 50);
-        detailLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+    private void renderResultView() {
+        String name = editName.getText().toString().trim();
+        String regNo = editRegNo.getText().toString().trim();
+        String dept = spinnerDept.getSelectedItem().toString();
 
-        TextView textViewName = new TextView(this);
-        textViewName.setText("Name: " + name);
-        textViewName.setTextSize(22);
-        textViewName.setTypeface(null, Typeface.BOLD);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(40, 80, 40, 40);
+        layout.setGravity(Gravity.CENTER_HORIZONTAL);
 
-        TextView textViewRegNo = new TextView(this);
-        textViewRegNo.setText("Reg No: " + regNo);
-        textViewRegNo.setTextSize(22);
-        textViewRegNo.setTypeface(null, Typeface.BOLD);
+        TextView tvTitle = new TextView(this);
+        tvTitle.setText("Registered Details\n");
+        tvTitle.setTextSize(22);
+        tvTitle.setTypeface(null, Typeface.BOLD);
 
-        TextView textViewDept = new TextView(this);
-        textViewDept.setText("Department: " + dept);
-        textViewDept.setTextSize(22);
-        textViewDept.setTypeface(null, Typeface.BOLD);
+        TextView tvDetails = new TextView(this);
+        tvDetails.setText("Name: " + name + "\nReg No: " + regNo + "\nDepartment: " + dept);
+        tvDetails.setTextSize(18);
 
-        detailLayout.addView(textViewName);
-        detailLayout.addView(textViewRegNo);
-        detailLayout.addView(textViewDept);
+        layout.addView(tvTitle);
+        layout.addView(tvDetails);
 
-        setContentView(detailLayout);
+        setContentView(layout);
     }
 }
 
@@ -205,91 +189,75 @@ public class MainActivity extends AppCompatActivity {
     android:gravity="center_horizontal">
 
     <TextView
-        android:id="@+id/titleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="STUDENT DETAIL FORM"
-        android:textSize="22sp"
+        android:text="STUDENT REGISTRATION"
+        android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginBottom="24dp" />
 
     <EditText
-        android:id="@+id/editTextName"
+        android:id="@+id/editName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Name"
-        android:textSize="18sp"
-        android:layout_marginBottom="16dp" />
+        android:hint="Enter Student Name"
+        android:layout_marginBottom="12dp" />
 
     <EditText
-        android:id="@+id/editTextRegNo"
+        android:id="@+id/editRegNo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Reg No"
-        android:textSize="18sp"
+        android:hint="Enter Register Number"
+        android:layout_marginBottom="16dp" />
+
+    <Spinner
+        android:id="@+id/spinnerDept"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="24dp" />
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btnSubmit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="32dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Dept: "
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <Spinner
-            android:id="@+id/spinnerDept"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/buttonSubmit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Submit" />
+        android:text="Submit Form" />
 
 </LinearLayout>`,
-    output: `Name: hema\nReg No: 41\nDepartment: CS`,
+    output: `Registered Details\n\nName: Saravanan\nReg No: 211CS101\nDepartment: CS`,
     howItWorks: [
-      "Spinner acts as a dropdown menu populated via ArrayAdapter.",
-      "Form input values are retrieved as strings on button click.",
-      "A new LinearLayout is dynamically constructed and displayed using setContentView()."
+      "ArrayAdapter maps string array models to UI Spinner dropdown items.",
+      "Input strings are safely extracted using getText().toString().trim().",
+      "Dynamic view creation via Programmatic Java components allows interface swapping without extra XML activities."
     ],
     examTips: [
-      "ArrayAdapter bridges array data with the Spinner UI component.",
-      "Use getText().toString().trim() to extract clean string inputs."
+      "Remember ArrayAdapter instantiation requires context, layout style, and array data.",
+      "Use trim() to sanitize empty spaces on text retrieval."
     ]
   },
+
+  // --- PRACTICAL 03 ---
   {
     id: 15,
     number: "03",
     title: "Primitives — Draw Basic Shapes",
     category: "ANDROID",
-    shortDescription: "Draw line, rectangle, and circle using Canvas and Paint.",
-    aim: "To develop an Android application that draws graphical primitives such as a line, rectangle, and circle using Canvas.",
+    shortDescription: "Render graphical primitive shapes using Canvas drawing methods and Paint configurations.",
+    aim: "To construct an Android application that renders custom graphical primitives (Line, Rectangle, Circle) on Canvas.",
     algorithm: [
-      "Start the application and load the main activity.",
-      "Create a custom View for drawing graphical objects.",
-      "Initialize a Paint object and enable anti-aliasing.",
-      "Set required stroke width and color parameters.",
-      "Override the onDraw() method of the custom View.",
-      "Set Canvas background color to white.",
-      "Draw a line, rectangle, and circle using Canvas drawing methods.",
-      "Display all shapes on screen and stop."
+      "Create custom DrawingView class extending fundamental Android View class.",
+      "Initialize Paint object with appropriate stroke properties, anti-aliasing, and colors.",
+      "Override onDraw(Canvas canvas) render callback method.",
+      "Clear canvas background and draw custom primitives via drawLine(), drawRect(), and drawCircle().",
+      "Inject custom DrawingView instance into Activity layout container dynamically."
     ],
     code: `// MainActivity.java
-package com.example.ex3;
+package com.example.lab03;
 
-import android.os.Bundle;
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
@@ -300,19 +268,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FrameLayout layout = findViewById(R.id.frameLayout);
-        layout.addView(new DrawingView(this));
+        FrameLayout layout = findViewById(R.id.frameContainer);
+        layout.addView(new GraphicsView(this));
     }
 
-    public static class DrawingView extends View {
-        Paint paint;
+    private static class GraphicsView extends View {
+        private final Paint paint = new Paint();
 
-        public DrawingView(Context context) {
+        public GraphicsView(Context context) {
             super(context);
-            paint = new Paint();
             paint.setAntiAlias(true);
-            paint.setStrokeWidth(8);
-            paint.setTextSize(40);
+            paint.setStrokeWidth(6f);
         }
 
         @Override
@@ -320,17 +286,17 @@ public class MainActivity extends AppCompatActivity {
             super.onDraw(canvas);
             canvas.drawColor(Color.WHITE);
 
-            // Line
-            paint.setColor(Color.BLACK);
+            // 1. Draw Line
+            paint.setColor(Color.BLUE);
             canvas.drawLine(100, 100, 500, 100, paint);
 
-            // Rectangle
-            paint.setColor(Color.GREEN);
-            canvas.drawRect(100, 150, 300, 300, paint);
+            // 2. Draw Rectangle
+            paint.setColor(Color.RED);
+            canvas.drawRect(100, 180, 400, 380, paint);
 
-            // Circle
-            paint.setColor(Color.YELLOW);
-            canvas.drawCircle(400, 400, 80, paint);
+            // 3. Draw Circle
+            paint.setColor(Color.GREEN);
+            canvas.drawCircle(250, 550, 100, paint);
         }
     }
 }
@@ -338,39 +304,39 @@ public class MainActivity extends AppCompatActivity {
 <!-- activity_main.xml -->
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/frameLayout"
+    android:id="@+id/frameContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />`,
-    output: `[Canvas Rendering: Black Line, Green Rectangle, Yellow Circle]`,
+    output: `[Canvas Canvas Output: Blue Line, Red Rectangle, Green Circle]`,
     howItWorks: [
-      "DrawingView extends Android View class to draw custom graphics.",
-      "onDraw(Canvas) executes graphics operations automatically on layout render.",
-      "Paint object sets drawing styles such as color and stroke width."
+      "Custom GraphicsView overrides onDraw() to issue direct GPU canvas instructions.",
+      "Paint defines styling metadata like color values, rendering mode, and stroke width.",
+      "Canvas executes native coordinates rendering directly on layout render."
     ],
     examTips: [
       "drawLine(startX, startY, stopX, stopY, paint).",
       "drawRect(left, top, right, bottom, paint).",
-      "drawCircle(cx, cy, radius, paint)."
+      "drawCircle(centerX, centerY, radius, paint)."
     ]
   },
+
+  // --- PRACTICAL 04 ---
   {
     id: 16,
     number: "04",
     title: "Database — SQLite Student Data",
     category: "ANDROID",
-    shortDescription: "Insert and retrieve student records using SQLite database.",
-    aim: "To develop an Android application that inserts and retrieves student data using an SQLite database.",
+    shortDescription: "Insert and fetch student records using SQLite Database integration.",
+    aim: "To build an Android application capable of inserting and querying student data entries via local SQLite DB.",
     algorithm: [
-      "Create DatabaseHelper class extending SQLiteOpenHelper.",
-      "Create student table with ID, name, and marks fields.",
-      "Provide input fields for entering student name and marks.",
-      "When Add Data is clicked, insert records into database table.",
-      "When View Data is clicked, query database and fetch records via Cursor.",
-      "Display retrieved records inside an AlertDialog.",
-      "Stop the application."
+      "Construct SQLiteOpenHelper helper class specifying table columns (id, name, marks).",
+      "Implement onCreate() to execute SQL table creation statement.",
+      "Provide helper methods insertData() and getAllData() for DB operations.",
+      "Bind Activity input fields to trigger record insertion using ContentValues.",
+      "Query DB via rawQuery(), extract results using Cursor, and present records in an AlertDialog."
     ],
     code: `// DatabaseHelper.java
-package com.example.pro4;
+package com.example.lab04;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -379,19 +345,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "student.db";
+    private static final String DB_NAME = "student.db";
     private static final String TABLE_NAME = "students";
-    private static final String COL_ID = "id";
-    private static final String COL_NAME = "name";
-    private static final String COL_MARKS = "marks";
 
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DB_NAME, null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_NAME + " TEXT, " + COL_MARKS + " INTEGER)");
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT, MARKS INTEGER)");
     }
 
     @Override
@@ -400,85 +363,80 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertData(String name, int marks) {
+    public boolean insertStudent(String name, int marks) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(COL_NAME, name);
-        contentValues.put(COL_MARKS, marks);
-        long result = db.insert(TABLE_NAME, null, contentValues);
-        return result != -1;
+        ContentValues values = new ContentValues();
+        values.put("NAME", name);
+        values.put("MARKS", marks);
+        return db.insert(TABLE_NAME, null, values) != -1;
     }
 
-    public Cursor getAllData() {
+    public Cursor fetchStudents() {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
     }
 }
 
 // MainActivity.java
-package com.example.pro4;
+package com.example.lab04;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.TextView;
-import android.app.AlertDialog;
-import android.graphics.Typeface;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-    DatabaseHelper myDb;
-    EditText editName, editMarks;
-    Button btnAdd, btnView;
+    private DatabaseHelper dbHelper;
+    private EditText editName, editMarks;
+    private Button btnAdd, btnView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        myDb = new DatabaseHelper(this);
+        dbHelper = new DatabaseHelper(this);
         editName = findViewById(R.id.editName);
         editMarks = findViewById(R.id.editMarks);
         btnAdd = findViewById(R.id.btnAdd);
         btnView = findViewById(R.id.btnView);
 
         btnAdd.setOnClickListener(v -> {
-            boolean isInserted = myDb.insertData(
-                editName.getText().toString(),
-                Integer.parseInt(editMarks.getText().toString())
-            );
-            if (isInserted) Toast.makeText(MainActivity.this, "Data Inserted", Toast.LENGTH_SHORT).show();
-            else Toast.makeText(MainActivity.this, "Insert Failed", Toast.LENGTH_SHORT).show();
+            String name = editName.getText().toString().trim();
+            String marksStr = editMarks.getText().toString().trim();
+
+            if (name.isEmpty() || marksStr.isEmpty()) return;
+
+            boolean inserted = dbHelper.insertStudent(name, Integer.parseInt(marksStr));
+            Toast.makeText(this, inserted ? "Success" : "Failed", Toast.LENGTH_SHORT).show();
+            if (inserted) { editName.setText(""); editMarks.setText(""); }
         });
 
         btnView.setOnClickListener(v -> {
-            Cursor res = myDb.getAllData();
-            if (res.getCount() == 0) {
-                showMessage("Error", "No Data Found");
+            Cursor cursor = dbHelper.fetchStudents();
+            if (cursor.getCount() == 0) {
+                showAlert("Database Status", "No records found.");
                 return;
             }
-            StringBuilder buffer = new StringBuilder();
-            while (res.moveToNext()) {
-                buffer.append("Name: ").append(res.getString(1)).append("\n");
-                buffer.append("Marks: ").append(res.getString(2)).append("\n\n");
+            StringBuilder builder = new StringBuilder();
+            while (cursor.moveToNext()) {
+                builder.append("ID: ").append(cursor.getInt(0)).append("\n");
+                builder.append("Name: ").append(cursor.getString(1)).append("\n");
+                builder.append("Marks: ").append(cursor.getInt(2)).append("\n\n");
             }
-            showMessage("Student Data", buffer.toString());
+            showAlert("Student Records", builder.toString());
         });
     }
 
-    public void showMessage(String title, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title);
-        TextView textView = new TextView(this);
-        textView.setTextSize(20);
-        textView.setTypeface(null, Typeface.BOLD);
-        textView.setText(message);
-        textView.setPadding(40, 40, 40, 40);
-        builder.setView(textView);
-        builder.setCancelable(true);
-        builder.show();
+    private void showAlert(String title, String message) {
+        new AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show();
     }
 }
 
@@ -488,66 +446,65 @@ public class MainActivity extends AppCompatActivity {
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp">
 
     <EditText
         android:id="@+id/editName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Name" />
+        android:hint="Student Name" />
 
     <EditText
         android:id="@+id/editMarks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Marks"
-        android:inputType="number" />
+        android:hint="Student Marks"
+        android:inputType="number"
+        android:layout_marginBottom="16dp" />
 
     <Button
         android:id="@+id/btnAdd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Data" />
+        android:text="Add Record" />
 
     <Button
         android:id="@+id/btnView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="View Data" />
+        android:text="View All Records" />
 
 </LinearLayout>`,
-    output: `Student Data\n\nName: hema\nMarks: 400\n\nName: abi\nMarks: 410`,
+    output: `Student Records\n\nID: 1\nName: Saravanan\nMarks: 95`,
     howItWorks: [
-      "SQLiteOpenHelper creates and manages database schema lifecycle.",
-      "ContentValues wraps key-value pairs for DB record insertions.",
-      "Cursor traverses result sets returned by rawQuery SELECT statements."
+      "SQLiteOpenHelper creates database schemas and manages connection instances.",
+      "ContentValues wraps key-value field structures required for inserting DB tuples.",
+      "Cursor iterates through query result sets using cursor.moveToNext()."
     ],
     examTips: [
-      "SQLiteOpenHelper requires onCreate() and onUpgrade() implementations.",
-      "db.insert() returns -1 if the record insertion fails.",
-      "Use cursor.moveToNext() inside a loop to fetch all records."
+      "db.insert() returns row ID on success or -1 if an insertion error occurs.",
+      "Always check cursor.getCount() == 0 before starting string builder extraction."
     ]
   },
+
+  // --- PRACTICAL 05 ---
   {
     id: 17,
     number: "05",
     title: "Notification Manager — Display Alert",
     category: "ANDROID",
-    shortDescription: "Create a NotificationChannel and push system notifications.",
-    aim: "To develop an Android application that creates and displays a notification using the Notification Manager.",
+    shortDescription: "Construct NotificationChannel and trigger system status bar alerts.",
+    aim: "To implement an Android application that configures a NotificationChannel and fires alerts using NotificationManager.",
     algorithm: [
-      "Check POST_NOTIFICATIONS runtime permission for Android 13+.",
-      "Create NotificationChannel with channel ID, name, and importance level.",
-      "Create a button click listener to trigger notifications.",
-      "Build notification properties using NotificationCompat.Builder.",
-      "Send notification through NotificationManager notify().",
-      "Stop the application."
+      "Check and request POST_NOTIFICATIONS runtime permission for modern Android API support.",
+      "Instantiate NotificationChannel with required channel ID, title, and importance parameters.",
+      "Register created NotificationChannel with system NotificationManager.",
+      "Configure NotificationCompat.Builder detailing title, body, icon, and PendingIntent.",
+      "Dispatch notification using notificationManager.notify()."
     ],
     code: `// MainActivity.java
-package com.example.pro5;
+package com.example.lab05;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -556,9 +513,13 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String CHANNEL_ID = "demo_channel";
+    private static final String CHANNEL_ID = "lab_channel";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -566,42 +527,149 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{ android.Manifest.permission.POST_NOTIFICATIONS }, 101);
             }
         }
 
-        createNotificationChannel();
-        Button btnNotify = findViewById(R.id.notifyButton);
-        btnNotify.setOnClickListener(v -> showNotification());
+        setupNotificationChannel();
+
+        Button btnNotify = findViewById(R.id.btnNotify);
+        btnNotify.setOnClickListener(v -> triggerNotification());
     }
 
-    private void createNotificationChannel() {
+    private void setupNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Demo Channel";
-            String description = "Channel for demo notifications";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+            NotificationChannel channel = new NotificationChannel(
+                CHANNEL_ID,
+                "Lab Notifications",
+                NotificationManager.IMPORTANCE_DEFAULT
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) manager.createNotificationChannel(channel);
         }
     }
 
-    private void showNotification() {
+    private void triggerNotification() {
         Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+            this, 0, intent, PendingIntent.FLAG_IMMUTABLE
+        );
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Hello from Notification Manager")
-            .setContentText("This is your first notification!")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("Lab Workspace Alert")
+            .setContentText("Notification service executed successfully.")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true);
 
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(1, builder.build());
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (manager != null) manager.notify(1, builder.build());
+    }
+}
+
+<!-- activity_main.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="24dp">
+
+    <Button
+        android:id="@+id/btnNotify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Trigger System Notification" />
+
+</LinearLayout>
+
+<!-- AndroidManifest.xml (Permission Entry) -->
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>`,
+    output: `[Status Bar Alert: Lab Workspace Alert - Notification service executed successfully.]`,
+    howItWorks: [
+      "NotificationChannel initialization is required on API level 26+ devices.",
+      "NotificationCompat.Builder structures system notification attributes.",
+      "NotificationManager.notify() posts the built notification to the status bar."
+    ],
+    examTips: [
+      "Specify PendingIntent.FLAG_IMMUTABLE to meet target API safety standards.",
+      "Declare POST_NOTIFICATIONS in AndroidManifest.xml for Android 13+ devices."
+    ]
+  },
+
+  // --- PRACTICAL 06 ---
+  {
+    id: 18,
+    number: "06",
+    title: "Threading — Start, Stop & Restart",
+    category: "ANDROID",
+    shortDescription: "Multithreaded counter executing async updates safely via Handler UI posting.",
+    aim: "To build an Android application demonstrating multithreading using background worker threads, Handler, and atomic state flags.",
+    algorithm: [
+      "Instantiate Handler object to enable safe communication across threads.",
+      "Start counter thread on 'Start' button click, executing continuous loops with 1-second delays.",
+      "Use Handler.post() inside the thread loop to safely update UI text view.",
+      "Halt background thread loop safely on 'Stop' click by toggling a volatile boolean flag.",
+      "Reset counter value to zero and re-run execution thread on 'Restart' click."
+    ],
+    code: `// MainActivity.java
+package com.example.lab06;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Button;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    private TextView tvCounter;
+    private Button btnStart, btnStop, btnRestart;
+
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private volatile boolean isRunning = false;
+    private int count = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        tvCounter = findViewById(R.id.tvCounter);
+        btnStart = findViewById(R.id.btnStart);
+        btnStop = findViewById(R.id.btnStop);
+        btnRestart = findViewById(R.id.btnRestart);
+
+        btnStart.setOnClickListener(v -> startThread());
+        btnStop.setOnClickListener(v -> isRunning = false);
+        btnRestart.setOnClickListener(v -> restartThread());
+    }
+
+    private void startThread() {
+        if (isRunning) return;
+        isRunning = true;
+
+        new Thread(() -> {
+            while (isRunning) {
+                final int current = count;
+                mainHandler.post(() -> tvCounter.setText("Count: " + current));
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+                count++;
+            }
+        }).start();
+    }
+
+    private void restartThread() {
+        isRunning = false;
+        count = 0;
+        tvCounter.setText("Count: 0");
+        startThread();
     }
 }
 
@@ -614,175 +682,64 @@ public class MainActivity extends AppCompatActivity {
     android:gravity="center"
     android:padding="24dp">
 
-    <Button
-        android:id="@+id/notifyButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Trigger Alarm Notification" />
-
-</LinearLayout>
-
-<!-- AndroidManifest.xml (Permission Entry) -->
-<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>`,
-    output: `[System Status Bar: Hello from Notification Manager]`,
-    howItWorks: [
-      "NotificationChannel is required for Android 8.0 (API 26) and above.",
-      "NotificationCompat.Builder formats notification title, icon, and body text.",
-      "NotificationManager.notify() posts the configured alert to system UI."
-    ],
-    examTips: [
-      "NotificationChannel must be registered before showing notifications on API 26+.",
-      "PendingIntent.FLAG_IMMUTABLE is required for target SDK 31+."
-    ]
-  },
-  {
-    id: 18,
-    number: "06",
-    title: "Threading — Start, Stop & Restart",
-    category: "ANDROID",
-    shortDescription: "Counter thread with Start, Stop, and Restart controls.",
-    aim: "To develop an Android application that demonstrates threading by implementing a counter with Start, Stop, and Restart operations.",
-    algorithm: [
-      "Initialize counter variable to 0.",
-      "Create Start, Stop, and Restart buttons in activity layout.",
-      "When Start is clicked, spawn a background worker Thread.",
-      "Sleep thread for 1 second, increment counter, and update UI via Handler.",
-      "When Stop is clicked, change running state flag to halt loop.",
-      "When Restart is clicked, reset counter to 0 and restart thread.",
-      "Stop the application."
-    ],
-    code: `// MainActivity.java
-package com.example.lab6;
-
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-import android.os.Handler;
-import android.widget.Button;
-import android.widget.TextView;
-
-public class MainActivity extends AppCompatActivity {
-    private TextView textViewCounter;
-    private Button buttonStart, buttonStop, buttonRestart;
-    private Handler handler = new Handler();
-    private Thread counterThread;
-    private volatile boolean isRunning = false;
-    private int counter = 0;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        textViewCounter = findViewById(R.id.textViewCounter);
-        buttonStart = findViewById(R.id.buttonStart);
-        buttonStop = findViewById(R.id.buttonStop);
-        buttonRestart = findViewById(R.id.buttonRestart);
-
-        buttonStart.setOnClickListener(v -> startCounter());
-        buttonStop.setOnClickListener(v -> stopCounter());
-        buttonRestart.setOnClickListener(v -> restartCounter());
-    }
-
-    private void startCounter() {
-        if (isRunning) return;
-        isRunning = true;
-        counterThread = new Thread(() -> {
-            while (isRunning) {
-                final int currentCount = counter;
-                handler.post(() -> textViewCounter.setText("count = " + currentCount));
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    break;
-                }
-                counter++;
-            }
-        });
-        counterThread.start();
-    }
-
-    private void stopCounter() {
-        isRunning = false;
-    }
-
-    private void restartCounter() {
-        isRunning = false;
-        counter = 0;
-        textViewCounter.setText("count = 0");
-        startCounter();
-    }
-}
-
-<!-- activity_main.xml -->
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="20dp">
-
     <TextView
-        android:id="@+id/textViewCounter"
+        android:id="@+id/tvCounter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="count = 0"
-        android:textSize="36sp"
-        android:layout_marginBottom="20dp" />
+        android:text="Count: 0"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp" />
 
     <Button
-        android:id="@+id/buttonStart"
-        android:layout_width="wrap_content"
+        android:id="@+id/btnStart"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start" />
+        android:text="Start Counter" />
 
     <Button
-        android:id="@+id/buttonStop"
-        android:layout_width="wrap_content"
+        android:id="@+id/btnStop"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Stop" />
+        android:text="Stop Counter" />
 
     <Button
-        android:id="@+id/buttonRestart"
-        android:layout_width="wrap_content"
+        android:id="@+id/btnRestart"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Restart" />
+        android:text="Restart Counter" />
 
 </LinearLayout>`,
-    output: `count = 5\n\n[Start]  [Stop]  [Restart]`,
+    output: `Count: 8\n\n[Start Counter]\n[Stop Counter]\n[Restart Counter]`,
     howItWorks: [
-      "Worker Thread executes looping counter off the main UI Thread.",
-      "Handler.post() dispatches UI change tasks safely onto UI Thread.",
-      "volatile boolean flag controls background loop execution state safely."
+      "Worker Threads manage background execution loops without freezing main thread operations.",
+      "Handler.post() dispatches UI updates back onto the Main Looper Thread safely.",
+      "volatile keyword ensures variable visibility across parallel threads."
     ],
     examTips: [
-      "Background threads cannot directly modify UI views; always use Handler.",
-      "Thread.sleep(1000) creates a 1-second delay between count updates."
+      "Never modify UI elements directly inside background threads.",
+      "Use volatile booleans for thread-safe state toggling."
     ]
   },
+
+  // --- PRACTICAL 07 ---
   {
     id: 19,
     number: "07",
     title: "GPS Tracker — Get Current Location",
     category: "ANDROID",
-    shortDescription: "Fetch device Latitude and Longitude using LocationManager.",
-    aim: "To develop an Android application that obtains and displays the current GPS location of the device.",
+    shortDescription: "Fetch geographic coordinates using device LocationManager hardware.",
+    aim: "To build an Android application retrieving and displaying precise device GPS Latitude and Longitude metrics.",
     algorithm: [
-      "Check for ACCESS_FINE_LOCATION runtime permission.",
-      "If missing, request location permission from the user.",
-      "Check whether GPS provider is enabled on device.",
-      "Request location updates from LocationManager.",
-      "Read latitude and longitude coordinates inside onLocationChanged().",
-      "Display location in TextView and remove updates to save battery.",
-      "Stop the application."
+      "Check ACCESS_FINE_LOCATION permission state at runtime.",
+      "Request location permissions if access is not yet granted.",
+      "Initialize LocationManager and verify that GPS hardware provider is active.",
+      "Request location updates using LocationManager.requestLocationUpdates().",
+      "Process coordinates inside onLocationChanged() callback and display results on screen."
     ],
     code: `// MainActivity.java
-package com.example.lab7;
+package com.example.lab07;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -793,51 +750,43 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
-    private TextView textViewLocation;
-    private Button buttonGetLocation;
+    private TextView tvLocation;
     private LocationManager locationManager;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textViewLocation = findViewById(R.id.textViewLocation);
-        buttonGetLocation = findViewById(R.id.buttonGetLocation);
+        tvLocation = findViewById(R.id.tvLocation);
+        Button btnGet = findViewById(R.id.btnGetLocation);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        buttonGetLocation.setOnClickListener(v -> checkLocationPermissionAndGet());
-    }
-
-    private void checkLocationPermissionAndGet() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-        } else {
-            fetchLocation();
-        }
+        btnGet.setOnClickListener(v -> fetchLocation());
     }
 
     private void fetchLocation() {
-        try {
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                textViewLocation.setText("Fetching location...");
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-            } else {
-                Toast.makeText(this, "Please turn on your GPS!", Toast.LENGTH_SHORT).show();
-            }
-        } catch (SecurityException e) {
-            e.printStackTrace();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.ACCESS_FINE_LOCATION }, 100);
+            return;
+        }
+
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            tvLocation.setText("Acquiring GPS Signal...");
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+        } else {
+            Toast.makeText(this, "Enable GPS hardware in settings", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-        textViewLocation.setText("Latitude:\n" + latitude + "\nLongitude: " + longitude);
+        tvLocation.setText("Latitude: " + location.getLatitude() + "\nLongitude: " + location.getLongitude());
         locationManager.removeUpdates(this);
     }
 }
@@ -849,60 +798,60 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="20dp">
+    android:padding="24dp">
 
     <TextView
-        android:id="@+id/textViewLocation"
+        android:id="@+id/tvLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Location: Not Available"
+        android:text="Location: Unavailable"
         android:textSize="18sp"
         android:gravity="center"
-        android:layout_marginBottom="20dp" />
+        android:layout_marginBottom="24dp" />
 
     <Button
-        android:id="@+id/buttonGetLocation"
-        android:layout_width="wrap_content"
+        android:id="@+id/btnGetLocation"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Get GPS Location" />
+        android:text="Fetch Current GPS Location" />
 
 </LinearLayout>
 
-<!-- AndroidManifest.xml (Permission Entries) -->
+<!-- AndroidManifest.xml (Permissions) -->
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />`,
-    output: `Latitude:\n37.421998333333335\nLongitude: -122.084`,
+    output: `Latitude: 11.0168\nLongitude: 76.9558`,
     howItWorks: [
-      "LocationManager manages device location provider hardware.",
-      "LocationListener interface handles location change callbacks.",
-      "removeUpdates(this) unregisters listener once location is obtained."
+      "LocationManager coordinates data acquisition from underlying GPS hardware.",
+      "LocationListener interface fires onLocationChanged() when new coordinates are resolved.",
+      "removeUpdates(this) detaches listeners to conserve battery power once data is acquired."
     ],
     examTips: [
-      "Declare ACCESS_FINE_LOCATION in AndroidManifest.xml.",
-      "Always verify location permission at runtime before requesting updates."
+      "Declare ACCESS_FINE_LOCATION permission inside AndroidManifest.xml.",
+      "Unregister listeners via removeUpdates() after fetching location coordinates."
     ]
   },
+
+  // --- PRACTICAL 08 ---
   {
     id: 20,
     number: "08",
     title: "Write Data to External Storage",
     category: "ANDROID",
-    shortDescription: "Write user text to my_data.txt in external storage.",
-    aim: "To develop an Android application that writes user-entered text into a file in external storage.",
+    shortDescription: "Write user-entered text into app-specific external storage text files.",
+    aim: "To build an Android application capable of writing user text data into files stored within external storage space.",
     algorithm: [
-      "Start application and load input layout.",
-      "Read text string entered into EditText component.",
-      "Check if external storage media state is Environment.MEDIA_MOUNTED.",
-      "Get application external directory via getExternalFilesDir().",
-      "Open FileOutputStream in append mode for target file my_data.txt.",
-      "Write text bytes into file and display file path status.",
-      "Stop the application."
+      "Verify external storage state using Environment.getExternalStorageState().",
+      "Confirm media availability equals Environment.MEDIA_MOUNTED.",
+      "Retrieve app-specific directory via getExternalFilesDir(null).",
+      "Instantiate FileOutputStream in append mode (true) targeting my_data.txt.",
+      "Write data bytes using try-with-resources and present operation output path."
     ],
     code: `// MainActivity.java
-package com.example.pro8;
+package com.example.lab08;
 
-import android.os.Environment;
 import android.os.Bundle;
+import android.os.Environment;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -913,8 +862,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText etData;
-    private Button btnWrite;
+    private EditText editInput;
     private TextView tvStatus;
 
     @Override
@@ -922,37 +870,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        etData = findViewById(R.id.etData);
-        btnWrite = findViewById(R.id.btnWrite);
+        editInput = findViewById(R.id.editInput);
         tvStatus = findViewById(R.id.tvStatus);
+        Button btnSave = findViewById(R.id.btnSave);
 
-        btnWrite.setOnClickListener(v -> {
-            String data = etData.getText().toString().trim();
-            if (data.isEmpty()) {
-                Toast.makeText(MainActivity.this, "Please enter some text", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            writeToFile(data);
-        });
+        btnSave.setOnClickListener(v -> saveToExternalFile());
     }
 
-    private void writeToFile(String data) {
-        String state = Environment.getExternalStorageState();
-        if (!Environment.MEDIA_MOUNTED.equals(state)) {
-            tvStatus.setText("Status: External storage not available.");
+    private void saveToExternalFile() {
+        String input = editInput.getText().toString().trim();
+        if (input.isEmpty()) return;
+
+        if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            tvStatus.setText("Storage Unavailable");
             return;
         }
 
-        File externalDir = getExternalFilesDir(null);
-        File file = new File(externalDir, "my_data.txt");
+        File targetFile = new File(getExternalFilesDir(null), "my_data.txt");
 
-        try (FileOutputStream fos = new FileOutputStream(file, true)) {
-            fos.write((data + "\n").getBytes());
-            tvStatus.setText("Status: Successfully written to:\n" + file.getAbsolutePath());
-            etData.setText("");
-            Toast.makeText(this, "Data saved successfully!", Toast.LENGTH_SHORT).show();
+        try (FileOutputStream fos = new FileOutputStream(targetFile, true)) {
+            fos.write((input + "\n").getBytes());
+            tvStatus.setText("File Location:\n" + targetFile.getAbsolutePath());
+            editInput.setText("");
+            Toast.makeText(this, "Saved successfully!", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
-            tvStatus.setText("Status: Error writing file - " + e.getMessage());
+            tvStatus.setText("Error writing file: " + e.getMessage());
         }
     }
 }
@@ -963,93 +905,80 @@ public class MainActivity extends AppCompatActivity {
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center_horizontal">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SD Card / External Storage Writer"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp" />
+    android:padding="24dp">
 
     <EditText
-        android:id="@+id/etData"
+        android:id="@+id/editInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter text to write..."
-        android:inputType="textMultiLine"
+        android:hint="Type text to store in file..."
         android:minLines="3"
         android:layout_marginBottom="16dp" />
 
     <Button
-        android:id="@+id/btnWrite"
+        android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Write to File"
-        android:layout_marginBottom="24dp" />
+        android:text="Save to External File"
+        android:layout_marginBottom="16dp" />
 
     <TextView
         android:id="@+id/tvStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Status: Waiting for input..."
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray" />
+        android:text="Status: Ready"
+        android:textSize="12sp" />
 
 </LinearLayout>`,
-    output: `Status: Successfully written to:\n/storage/emulated/0/Android/data/com.example.pro8/files/my_data.txt`,
+    output: `Status: Saved successfully!\nFile Location:\n/storage/emulated/0/Android/data/com.example.lab08/files/my_data.txt`,
     howItWorks: [
-      "Environment.getExternalStorageState() verifies SD/external storage availability.",
-      "getExternalFilesDir(null) accesses app-specific sandboxed directory.",
-      "FileOutputStream with append = true preserves existing file contents."
+      "Environment.getExternalStorageState() checks SD card mount status.",
+      "getExternalFilesDir(null) references isolated application storage paths.",
+      "FileOutputStream(file, true) appends data stream entries without overwriting existing file content."
     ],
     examTips: [
-      "getExternalFilesDir() does not require explicit dangerous storage permissions on newer Android versions.",
-      "Use try-with-resources to automatically close FileOutputStream."
+      "getExternalFilesDir() does not require runtime permissions on API 19+.",
+      "Use try-with-resources to automatically close I/O file streams."
     ]
   },
+
+  // --- PRACTICAL 09 ---
   {
     id: 21,
     number: "09",
     title: "Alert Message — AlertDialog",
     category: "ANDROID",
-    shortDescription: "Display popup dialog alert on button click.",
-    aim: "To develop an Android application that displays an alert message using an AlertDialog when a button is clicked.",
+    shortDescription: "Display modal alert popup windows on user button interactions.",
+    aim: "To implement an Android application displaying modal alert messages using AlertDialog.Builder.",
     algorithm: [
-      "Start application and load main activity layout.",
-      "Create Show Alert button in XML layout.",
-      "Initialize Button reference in MainActivity using findViewById().",
-      "Attach click listener to Button.",
-      "Create AlertDialog.Builder instance.",
-      "Set title, message, and OK positive button.",
-      "Call show() to display AlertDialog on screen.",
-      "Stop the application."
+      "Bind layout trigger Button reference using findViewById().",
+      "Attach setOnClickListener event handler to button.",
+      "Instantiate AlertDialog.Builder passing Activity context.",
+      "Set title, message content, and positive action button properties.",
+      "Call builder.show() to render popup modal overlay."
     ],
     code: `// MainActivity.java
-package com.example.demo9;
+package com.example.lab09;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.widget.Button;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-    private Button btnAlert;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnAlert = findViewById(R.id.btnAlert);
-        btnAlert.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Alert Message");
-            builder.setMessage("Welcome to Android Programming!");
-            builder.setPositiveButton("OK", null);
-            builder.show();
+        Button btnShowAlert = findViewById(R.id.btnShowAlert);
+
+        btnShowAlert.setOnClickListener(v -> {
+            new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Alert Message")
+                .setMessage("Welcome to Android Lab Workspace!")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
         });
     }
 }
@@ -1059,26 +988,25 @@ public class MainActivity extends AppCompatActivity {
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
     android:padding="24dp">
 
     <Button
-        android:id="@+id/btnAlert"
+        android:id="@+id/btnShowAlert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show Alert" />
+        android:text="Display Alert Message" />
 
 </LinearLayout>`,
-    output: `[Dialog Box]\n\nAlert Message\nWelcome to Android Programming!\n\n[ OK ]`,
+    output: `[Modal Dialog Overlay]\n\nAlert Message\nWelcome to Android Lab Workspace!\n\n[ OK ]`,
     howItWorks: [
-      "AlertDialog.Builder constructs popup dialog overlays.",
-      "setPositiveButton('OK', null) sets button action to dismiss dialog.",
-      "show() displays dialog window on top of current activity."
+      "AlertDialog.Builder constructs popup window overlays on top of active activities.",
+      "setPositiveButton() defines action handlers for user confirmations.",
+      "show() renders the configured dialog model onto the screen view."
     ],
     examTips: [
-      "Pass Activity context (MainActivity.this) to AlertDialog.Builder.",
-      "Use setNegativeButton() if you want to add a Cancel button."
+      "Always pass valid Activity context (e.g., MainActivity.this) to the builder.",
+      "Chain method calls (.setTitle().setMessage().show()) for concise syntax."
     ]
   }
 ];

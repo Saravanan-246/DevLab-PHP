@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 import Landing from "./pages/Landing";
 import Programs from "./pages/Programs";
@@ -12,30 +12,34 @@ const allPrograms = [...phpPrograms, ...androidPrograms];
 function App() {
   const [page, setPage] = useState("landing");
   const [selectedProgram, setSelectedProgram] = useState(null);
-  const [activeCategory, setActiveCategory] = useState("ALL");
+  const [activeCategory, setActiveCategory] = useState("PHP");
 
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("devlab-theme");
     return savedTheme === "light" ? "light" : "dark";
   });
 
+  // Keep theme attribute synchronized on root document
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("devlab-theme", theme);
   }, [theme]);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
+  }, []);
 
-  const openPrograms = (category = "ALL") => {
-    setActiveCategory(category);
+  // Directory navigation with category target
+  const openPrograms = useCallback((category = "ALL") => {
+    const targetCat = category === "ALL" ? "PHP" : category;
+    setActiveCategory(targetCat);
     setSelectedProgram(null);
     setPage("programs");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, []);
 
-  const openProgram = (programId) => {
+  // Practical view navigation
+  const openProgram = useCallback((programId) => {
     const program = allPrograms.find(
       (item) =>
         String(item.id) === String(programId) ||
@@ -47,19 +51,35 @@ function App() {
     setSelectedProgram(program);
     setPage("program");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, []);
 
-  const backToLanding = () => {
+  const backToLanding = useCallback(() => {
     setSelectedProgram(null);
     setPage("landing");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, []);
 
-  const backToPrograms = () => {
+  const backToPrograms = useCallback(() => {
     setSelectedProgram(null);
     setPage("programs");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, []);
+
+  // Global 'Escape' Key Handler for backwards navigation
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        if (page === "program") {
+          backToPrograms();
+        } else if (page === "programs") {
+          backToLanding();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [page, backToPrograms, backToLanding]);
 
   return (
     <div className="app">

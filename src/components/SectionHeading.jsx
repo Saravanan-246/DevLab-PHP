@@ -1,5 +1,5 @@
 import React from "react";
-import Logo from "./Logo";
+import Logo from "../components/Logo";
 
 function HeaderBrand({ track = "" }) {
   return (
@@ -14,21 +14,22 @@ function HeaderBrand({ track = "" }) {
         .header-brand {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
         }
 
         .header-brand__divider {
           width: 1px;
           height: 14px;
-          background: var(--border, #2d3748);
+          background: var(--border, #1e293b);
         }
 
         .header-brand__tag {
-          font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+          font-family: ui-monospace, SFMono-Regular, monospace;
           font-size: 11px;
           font-weight: 600;
-          color: var(--muted, #8a96a8);
-          letter-spacing: 0.03em;
+          color: var(--muted, #94a3b8);
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
         }
       `}</style>
     </div>

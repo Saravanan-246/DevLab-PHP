@@ -58,25 +58,26 @@ function ThemeToggle({
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 36px;
-          height: 36px;
-          border-radius: 8px;
-          border: 1px solid var(--border, #2a3441);
-          background: var(--surface, #11151c);
-          color: var(--muted, #94a3b8);
+          width: 34px;
+          height: 34px;
+          border-radius: var(--radius-md, 6px);
+          border: 1px solid var(--border);
+          background: var(--surface);
+          color: var(--muted);
           cursor: pointer;
           outline: none;
-          transition: all 0.18s ease;
+          transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
 
         .theme-toggle:hover {
-          border-color: var(--accent, #3b82f6);
-          color: var(--text, #f0f4f8);
-          background: var(--surface-soft, #161b24);
+          border-color: var(--border-strong);
+          color: var(--text);
+          background: var(--surface-soft);
         }
 
         .theme-toggle:focus-visible {
-          box-shadow: 0 0 0 2px var(--bg, #0d0f12), 0 0 0 4px var(--accent, #3b82f6);
+          outline: 2px solid var(--accent);
+          outline-offset: 2px;
         }
 
         .theme-toggle__icon {
@@ -84,7 +85,7 @@ function ThemeToggle({
         }
 
         .theme-toggle:hover .theme-toggle__icon {
-          transform: rotate(12deg);
+          transform: rotate(15deg);
         }
       `}</style>
     </button>
